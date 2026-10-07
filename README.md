@@ -210,12 +210,26 @@ make eval    # chạy tests/testset.jsonl qua eval/evaluate.py, in kết quả +
 
 ---
 
-## 11. Gợi ý phân công theo 3 tầng (tuỳ nhóm quyết định)
+## 11. Phân công theo 3 tầng + verify (nhóm đã chốt)
 
-Vì phần "Bảo vệ phần mình phụ trách" chấm riêng từng người, chia theo ranh giới rõ ràng sẽ dễ bảo vệ hơn chia theo file:
+Vì đề chấm theo RAG + Reasoning + Agent + MCP + Eval (không phải frontend/backend/report), nhóm chia đúng theo 3 tầng đề bài định nghĩa — mỗi người có 1 module kỹ thuật rõ ràng, dễ chứng minh đóng góp cá nhân khi vấn đáp:
 
-- **SV 1** — tầng (a) + MCP server: `rag/`, `mcp_server/server.py`.
-- **SV 2** — tầng (b) + (c): `domain/scoring.py`, `domain/appeals_store.py`, phần tool ghi/verify trong server.
-- **SV 3** — Agent loop + Evaluation: `agent/loop.py`, `agent/mcp_client.py`, `eval/evaluate.py`, `logs/`.
+| Người | Tầng chính | Module | + phụ trách thêm |
+|---|---|---|---|
+| **SV 1** | (a) Tra cứu | `rag/`, `mcp_server/server.py` (phần tool đọc: `search_regulations`, `get_document`) | **Agent Loop + MCP Client** — `agent/loop.py`, `agent/mcp_client.py` |
+| **SV 2** | (b) Biến đổi | `domain/scoring.py`, `mcp_server/server.py` (tool `calculate_conduct_score`) | **Evaluation** — `eval/evaluate.py` |
+| **SV 3** | (c) Hành động + Verify | `domain/appeals_store.py`, `mcp_server/server.py` (tool `submit_appeal`, `get_appeal_status`) | — |
+
+**Vì sao verify đi chung với Hành động, không tách riêng:** verify không phải một bước độc lập — nó là nửa còn lại của chính tool ghi (`submit_appeal` → `get_appeal_status`). Tách nó ra khỏi tầng (c) mới là sai bản chất.
+
+**Vì sao Agent Loop + MCP Client gắn với SV 1:** đây là phần quyết định *khi nào gọi tool nào*, `MAX_STEPS`, parse lỗi an toàn, discover tool động — không gắn riêng cho ai thì khi vấn đáp hỏi "Agent biết phải gọi tool này vì sao?", không ai trả lời dứt khoát được. Gắn với người phụ trách tra cứu là hợp lý vì search luôn là tool đầu tiên trong mọi luồng xử lý.
+
+**Lưu ý khi chuẩn bị vấn đáp cho SV 2:** `eval/evaluate.py` chạy qua *toàn bộ* testset (cả tra cứu, tính toán, hành động, no_answer), không chỉ riêng tầng (b) — nên cần hiểu sơ qua cả 3 tầng để giải thích được số liệu, không chỉ phần mình viết.
+
+**Bốn câu mỗi người phải trả lời được cho đúng module mình phụ trách** (giám khảo sẽ hỏi dạng này):
+- "Nếu tôi sửa dòng này thì hệ thống thay đổi gì?"
+- "Tại sao Agent biết phải gọi tool này?" *(SV 1 — agent loop)*
+- "Nếu corpus không có đáp án thì sao?" *(SV 1 — grounding + no_answer)*
+- "Làm sao chứng minh tool đã thực sự thay đổi dữ liệu?" *(SV 3 — submit_appeal → get_appeal_status)*
 
 Mỗi người nên có commit riêng rải trong 10 ngày (không dồn 1 commit cuối) để khớp yêu cầu "git history thể hiện cả ba thành viên làm việc thật".
