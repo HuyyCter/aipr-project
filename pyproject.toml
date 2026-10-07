@@ -1,0 +1,28 @@
+[project]
+name = "aipr-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "HuyyCter", email = "nguyenquanghuy070306@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "groq>=1.7.0",
+    "matplotlib>=3.11.2",
+    "mcp>=2.3.0",
+    "numpy>=2.5.3",
+    "openai>=3.26.0",
+    "python-dotenv>=1.2.4",
+    "rank-bm25>=0.2.2",
+    "requests>=2.34.2",
+    "rich>=15.0.0",
+    "sentence-transformers>=6.1.0",
+]
+
+[project.scripts]
+aipr-project = "aipr_project:main"
+
+[build-system]
+requires = ["uv_build>=0.12.5,<0.13.0"]
+build-backend = "uv_build"

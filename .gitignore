@@ -1,0 +1,33 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# uv / venv
+.venv/
+.python-version.bak
+
+# Secrets — KHÔNG được lộ key
+.env
+!.env.example
+
+# Cache — quy chế đã embed, không cần commit (sẽ tự tạo lại khi make setup/make demo chạy lần đầu)
+data/store_cache.json
+
+# Logs: giữ lại logs/*.jsonl vì đây là deliverable bắt buộc nộp (≥3 lần chạy thật)
+# chỉ ignore log rác/tạm nếu có
+logs/*.tmp
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+
+# Build / dist (nếu có)
+dist/
+build/
+*.egg
