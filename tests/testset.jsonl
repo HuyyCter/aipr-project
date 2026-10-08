@@ -1,0 +1,10 @@
+{"id": "q01", "question": "Mục ý thức chấp hành nội quy, quy chế tối đa bao nhiêu điểm?", "type": "direct", "expected_doc_ids": ["DOC0001"]}
+{"id": "q02", "question": "Hạn nộp khiếu nại kết quả đánh giá rèn luyện là bao lâu kể từ ngày công bố kết quả?", "type": "direct", "expected_doc_ids": ["DOC0003"]}
+{"id": "q03", "question": "Nếu sinh viên có minh chứng tham gia hoạt động chính trị-xã hội ở cả học kỳ này và quy định đã thay đổi so với năm trước, thì tính theo quy chế nào?", "type": "synthesis", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+{"id": "q04", "question": "Với minh chứng hiện có của sinh viên SV001 trong học kỳ này, điểm rèn luyện là bao nhiêu và xếp loại gì?", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0004"]}
+{"id": "q05", "question": "Tính điểm rèn luyện của sinh viên SV002, biết minh chứng mục hoạt động chính trị-xã hội chưa được nộp.", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0004"]}
+{"id": "q06", "question": "Tôi muốn khiếu nại điểm mục hoạt động chính trị-xã hội, lý do: còn thiếu 1 minh chứng chưa được tính vào điểm.", "type": "action", "expected_doc_ids": ["DOC0003"]}
+{"id": "q07", "question": "Học bổng khuyến khích học tập xét theo những tiêu chí nào?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q08", "question": "Mức học phí học kỳ này của sinh viên hệ chính quy là bao nhiêu?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q09", "question": "Quy định về thời gian tốt nghiệp sớm là gì?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q10", "question": "Thủ tục xin nghỉ học tạm thời cần những giấy tờ gì?", "type": "no_answer", "expected_doc_ids": []}
