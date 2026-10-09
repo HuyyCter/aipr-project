@@ -1,25 +1,24 @@
-# Nhiệm vụ SV1 — Tầng (a) Tra cứu + Agent Loop + MCP Client
+# Nhiệm vụ SV1 — RAG Pipeline (W3–W4)
 
 ## 1. Phạm vi trách nhiệm
 
-Bạn chịu trách nhiệm toàn bộ đường đi từ câu hỏi của người dùng đến lúc agent quyết định gọi tool nào, và toàn bộ cơ chế tìm kiếm tài liệu (dense + hybrid). Đây là 2 phần nặng kỹ thuật nhất của project (W3/W4 + W6/W7), vì agent loop là nơi mọi quyết định "gọi tool hay không, gọi tool nào" xảy ra.
+Bạn chịu trách nhiệm toàn bộ "bộ não tra cứu + biến đổi": từ việc chia nhỏ tài liệu, biến thành vector, tìm kiếm (dense + hybrid), cho đến việc dùng kết quả tìm được để tính điểm rèn luyện. Đây là lớp **nội bộ** (internal API) — không tự công bố ra ngoài qua MCP, mà để SV3 import và bọc thành tool. Bạn không cần biết gì về giao thức MCP hay cách agent loop hoạt động; chỉ cần hàm của bạn đúng, dễ gọi, dễ test độc lập.
 
-**File bạn sở hữu (viết + chịu trách nhiệm giải trình):**
+**File bạn sở hữu:**
 
 | File | Vai trò |
 |---|---|
 | `src/rag/models.py` | Data model `Document`, `DocumentChunk` |
-| `src/rag/chunking.py` | Chia nhỏ tài liệu theo Điều/Mục |
-| `src/rag/store.py` | VectorStore — dense search |
+| `src/rag/chunking.py` | Chia nhỏ tài liệu theo Điều/Mục, xử lý front-matter |
+| `src/rag/store.py` | VectorStore — dense search, cache |
 | `src/rag/hybrid_search.py` | Hybrid search (BM25 + dense) |
-| `src/agent/mcp_client.py` | Client MCP — discover + call tool |
-| `src/agent/loop.py` | Agent Loop — vòng lặp chính |
-| `prompts/system_agent.txt` | System prompt cho agent |
+| `src/domain/scoring.py` | Tính điểm rèn luyện, đối chiếu khung xếp loại |
+| `src/common/json_codec.py` | Encoder JSON cho `@dataclass`/`datetime` |
 | `prompts/grounding_rag.txt` | Grounding prompt cho câu trả lời có nguồn |
 
-**File bạn góp phần (chung với SV2, SV3):**
-- `src/mcp_server/server.py` — bạn viết đúng 2 tool: `search_regulations`, `get_document`
-- `data/source_docs/` — corpus đã chốt còn 2 file: `quy_dinh_diem_ren_luyen.md` (DOC0001) và `so_tay_sinh_vien.md` đã trích lọc 3 mục liên quan (DOC0002). Mỗi file có sẵn front-matter YAML (`doc_id`, `title`, `version`, `date`, `owner`) ở đầu — `chunking.py` phải tách khối này ra trước khi áp regex Điều/Mục, rồi parse thành `Document.metadata`, không coi nó là 1 chunk nội dung. Lưu ý: `version` 2 file khác nhau (2021 vs 2024) KHÔNG phải tình huống quy chế mâu thuẫn thật (số liệu giống nhau) — chỉ là 2 loại nguồn khác nhau (văn bản gốc vs sổ tay tóm tắt), chưa có tài liệu nào đóng vai "bản đã điều chỉnh" để test version-conflict.
+**Bạn dẫn dắt (cả nhóm góp):** `data/source_docs/` — corpus quy chế, vì bạn cần hiểu rõ nhất cấu trúc tài liệu để test chunking/retrieval.
+
+**Bạn KHÔNG viết `mcp_server/server.py`** — SV3 import trực tiếp các hàm của bạn (`store.search()`, `hybrid_search.search()`, `scoring.calculate_score()`) rồi bọc thành tool. Bạn chỉ cần đảm bảo signature + docstring rõ ràng để SV3 gọi đúng.
 
 ---
 
@@ -33,9 +32,9 @@ class Document:
     doc_id: str
     title: str
     content: str
-    version: str  # ví dụ "2024-v1", "2026-v2"
-    date: str  # ISO format "2026-01-15"
-    owner: str  # ví dụ "Phòng Công tác Sinh viên"
+    version: str  # ví dụ "2024-v1", "2021-v1"
+    date: str  # ISO format hoặc năm, ví dụ "2021"
+    owner: str  # ví dụ "Phòng Tuyển sinh và Công tác Sinh viên"
     metadata: dict = field(default_factory=dict)
 
 
@@ -48,31 +47,33 @@ class DocumentChunk:
     embedding: Optional[list[float]] = None
     metadata: dict = field(
         default_factory=dict
-    )  # kế thừa title/version/date từ Document gốc
+    )  # kế thừa title/version/date/owner từ Document gốc
 ```
 
-- Phải dùng `@dataclass` với type hint đầy đủ — đây là điểm bị kiểm bằng `grep "@dataclass"`.
-- `metadata` của `DocumentChunk` **phải** copy `version`, `date`, `doc_id` từ `Document` gốc — vì đây là cơ sở để agent phát hiện mâu thuẫn phiên bản (quy chế cũ vs mới) khi search trả về nhiều chunk cùng nội dung nhưng khác `version`.
+- Phải dùng `@dataclass` với type hint đầy đủ — điểm bị kiểm bằng `grep "@dataclass"`.
+- `metadata` của `DocumentChunk` **phải** copy `version`, `date`, `doc_id`, `owner` từ `Document` gốc — cơ sở để lọc theo metadata sau này (ví dụ ưu tiên văn bản gốc khi hỏi điều khoản pháp lý cụ thể).
 
 ### 2.2 `src/rag/chunking.py`
 
 ```python
 def chunk_document(
-    doc: Document, max_chars: int = 800, overlap: int = 100
-) -> list[DocumentChunk]:
+    doc_source: str, max_chars: int = 800, overlap: int = 100
+) -> Document:
     """
-    Chia theo ranh giới "Điều X" / "Mục X" (regex) trước, vì quy chế rèn luyện
-    cấu trúc theo điều khoản — cắt cứng theo số ký tự sẽ tách rời 1 tiêu chí
-    điểm khỏi phần diễn giải của nó, làm sai lệch cả retrieval lẫn scoring.
-    Nếu tài liệu không có cấu trúc Điều/Mục rõ (ví dụ danh sách minh chứng
-    hoạt động), fallback về fixed-size chunking với overlap.
+    Bước 1: tách front-matter YAML (giữa 2 dòng `---`) ở đầu file nguồn,
+    parse thành doc_id/title/version/date/owner.
+    Bước 2: chia phần nội dung còn lại theo ranh giới "Điều X" / "Mục X"
+    (regex) — vì quy chế rèn luyện cấu trúc theo điều khoản, cắt cứng theo
+    số ký tự sẽ tách rời 1 tiêu chí điểm khỏi phần diễn giải của nó, làm
+    sai lệch cả retrieval lẫn scoring. Nếu tài liệu không có cấu trúc
+    Điều/Mục rõ, fallback về fixed-size chunking với overlap.
     """
 ```
 
-- Viết đúng docstring 3-5 dòng như trên (hoặc tương đương) — dùng trực tiếp cho report mục 3, không được bỏ.
+- Viết đúng docstring 3-5 dòng như trên — dùng trực tiếp cho report mục 3, không được bỏ.
 - Regex gợi ý: `r"(?:^|\n)(Điều\s+\d+|Mục\s+\d+)"` để tìm điểm cắt.
-- Test bắt buộc: chunk 1 file quy chế thật, in ra để xác nhận mỗi chunk chứa trọn 1 điều khoản, không bị cắt giữa chừng.
-- **Bắt buộc xử lý front-matter trước khi chunk:** mỗi file nguồn bắt đầu bằng khối `---\n...\n---` chứa `doc_id/title/version/date/owner` — parse riêng khối này (ví dụ `yaml.safe_load` hoặc tách thủ công theo dòng `---`), gán vào `Document`, rồi mới chạy regex Điều/Mục trên phần nội dung còn lại.
+- **Bắt buộc xử lý front-matter trước khi chunk:** 2 file nguồn (`quy_dinh_diem_ren_luyen.md`, `so_tay_sinh_vien.md`) đều có sẵn khối `---\n doc_id: ...\n title: ...\n version: ...\n date: ...\n owner: ...\n---` ở đầu — không coi khối này là 1 chunk nội dung.
+- Test bắt buộc: chunk 2 file quy chế thật, in ra để xác nhận mỗi chunk chứa trọn 1 điều khoản, không bị cắt giữa chừng.
 
 ### 2.3 `src/rag/store.py`
 
@@ -80,94 +81,109 @@ def chunk_document(
 class VectorStore:
     def add_document(self, doc: Document) -> None: ...
     def embed_all(self) -> None:
-        """Chỉ embed chunk có embedding is None — tránh gọi API thừa."""
+        """Chỉ embed chunk có embedding is None — tránh gọi API thừa.
+        Gọi common/llm_client.embed() (SV2 sở hữu file này — xem mục 3)."""
 
     def search(self, query: str, top_k: int = 3) -> list[tuple[DocumentChunk, float]]:
         """Dense search — cosine similarity."""
 
-    def save(self, path: str) -> None: ...
+    def save(self, path: str) -> None: ...  # dùng common/json_codec.py
     def load(self, path: str) -> None: ...
 ```
 
-- `save()/load()` ghi ra `data/store_cache.json` — chạy `make demo` lần 2 không được gọi lại API embedding nếu cache còn hợp lệ.
+- `save()/load()` ghi ra `data/store_cache.json` bằng `common/json_codec.py` — chạy `make demo` lần 2 không được gọi lại API embedding nếu cache còn hợp lệ.
 
 ### 2.4 `src/rag/hybrid_search.py`
 
-- Dùng `rank_bm25` (đã có trong `pyproject.toml`) kết hợp điểm BM25 với điểm cosine similarity của `VectorStore` — có thể cộng có trọng số hoặc reciprocal rank fusion, chọn 1 cách và giải thích được lý do (cho report mục 3).
-- Nếu nhóm đã có sẵn file lab `ex2_1_hybrid_search.py` từ Week 4, copy nguyên vào đây rồi chỉ viết phần glue code gọi vào — **không viết lại thuật toán hybrid từ đầu** (đúng yêu cầu đề bài).
-- Signature: `def search(query: str, top_k: int = 3, mode: str = "hybrid") -> list[tuple[DocumentChunk, float]]` — `mode` chỉ dùng nội bộ cho `eval/evaluate.py` so sánh, **không** expose `mode` ra tool MCP (model không có cơ sở để tự chọn).
+- Dùng `rank_bm25` kết hợp điểm BM25 với điểm cosine similarity của `VectorStore` — có thể cộng có trọng số hoặc reciprocal rank fusion, chọn 1 cách và giải thích được lý do (cho report mục 3).
+- Nếu nhóm đã có sẵn file lab `ex2_1_hybrid_search.py` từ Week 4, copy nguyên vào đây rồi chỉ viết phần glue code gọi vào — **không viết lại thuật toán hybrid từ đầu**.
+- Signature: `def search(query: str, top_k: int = 3, mode: str = "hybrid") -> list[tuple[DocumentChunk, float]]` — `mode` chỉ dùng nội bộ cho `eval/evaluate.py` (của SV2) so sánh, **không** để SV3 expose `mode` ra tool MCP (model không có cơ sở để tự chọn).
 
-### 2.5 `src/agent/mcp_client.py`
+### 2.5 `src/domain/scoring.py`
 
-```python
-async def connect() -> ClientSession:
-    """Spawn mcp_server/server.py bằng sys.executable + đường dẫn TUYỆT ĐỐI.
-    Dùng python trần hoặc đường dẫn tương đối sẽ lỗi 'Connection closed' lúc initialize."""
-
-
-async def discover(session) -> list[Tool]:
-    """Gọi list_tools(). KHÔNG hard-code danh sách tool ở bất kỳ đâu trong file này."""
-
-
-async def call(session, tool_name: str, args: dict) -> str:
-    """Gọi call_tool(). Trả về nội dung text, không raise ra ngoài — lỗi đã được
-    server format thành chuỗi "Error: ..." sẵn."""
-```
-
-- In ra terminal dòng `Discovered N tools: [...]` ngay sau `discover()` — đây là bằng chứng bắt buộc dán vào report mục 5.
-- Tuyệt đối không có biến/dict nào tên kiểu `TOOL_REGISTRY` trong file này — sẽ bị `grep` khi chấm.
-
-### 2.6 `src/agent/loop.py`
+Đọc `category-mapping.md` trước khi viết file này — bảng ánh xạ 5 khoá chuẩn dùng xuyên suốt `category_scores`/`rubric`/`breakdown`, tránh so khớp nhầm giữa các cách viết khác nhau của cùng 1 mục (Điều 4 vs Phụ lục 1 vs minh chứng SV).
 
 ```python
-def run_agent(question: str, session, history: list[dict], max_steps: int = 6) -> str:
+@dataclass
+class ScoreResult:
+    raw_total: int  # tổng 5 mục trước khi chốt trần — có thể > 100
+    total: int  # min(raw_total, 100) theo Điều 4.2 — dùng để xếp loại
+    classification: str
+    breakdown: dict[str, int]  # key = khoá chuẩn, xem category-mapping.md
+    missing_categories: list[str] = field(default_factory=list)
+    confirmed_deduction_applied: bool = False
+
+
+def normalize_category(raw_name: str) -> str:
+    """Map tên mục thô (trích từ Điều 4/Điều 5-9/Phụ lục 1/minh chứng SV) về 1 trong
+    5 khoá chuẩn — xem bảng đầy đủ trong category-mapping.md. So khớp theo substring,
+    không phân biệt hoa/thường, không so khớp chuỗi chính xác."""
+
+
+def calculate_score(
+    category_scores: dict[str, int], rubric: dict, confirmed: bool = True
+) -> ScoreResult | str:
     """
-    Vòng lặp Week 6 nguyên bản: message → LLM (kèm tool schema từ discover()) →
-    nếu có tool_call thì gọi qua mcp_client.call() → đưa Observation lại → lặp.
-    Dừng khi: (1) model trả lời cuối cùng không kèm tool_call, hoặc (2) đạt max_steps.
+    Cộng tổng điểm 5 mục (key đã qua normalize_category), đối chiếu khung xếp loại
+    LẤY TỪ `rubric` (SV3 trích từ quy chế qua tool search_regulations, không
+    hard-code ngưỡng trong code).
+
+    Nếu thiếu dữ liệu 1 mục: trả "Error: thiếu dữ liệu mục '<tên mục>' — không thể
+    tính điểm", không tự suy đoán hay bỏ qua.
+
+    Nếu confirmed=False (SV không xác nhận điểm rèn luyện — Điều 12.3): trừ 10 điểm
+    vào raw_total trước khi chốt trần.
+
+    total PHẢI chốt trần ở 100 (min(raw_total, 100)) — 5 mục cộng đúng luật vẫn có
+    thể vượt 100 trên thực tế (dữ liệu thật: 27+25+19+30+2 = 103 → chốt 100, Xuất
+    sắc). Quy tắc này không file quy định nào viết tường minh thành công thức — chỉ
+    phát hiện được khi đối chiếu với bảng điểm thật (Điều 4.2 chỉ nói "khung 100").
     """
 ```
 
-- **Parse an toàn:** bọc `json.loads(tool_call.arguments)` trong try/except. Nếu lỗi (thiếu ngoặc, JSON hỏng): không raise, ghi vào Observation chuỗi `"Error: không parse được tham số tool"` và tiếp tục vòng lặp bình thường.
-- **MAX_STEPS:** nếu đạt giới hạn mà vẫn chưa có câu trả lời cuối, trả về thông báo rõ ràng kiểu `"Đã vượt quá số bước xử lý cho phép."`, không im lặng treo.
-- Mỗi bước gọi `agent/logger.py` (do nhóm thống nhất format, SV3 sở hữu file này) để ghi vào `logs/run_<timestamp>.jsonl`.
-- **Luật bắt buộc nằm trong `prompts/system_agent.txt`, không hard-code trong code:** sau khi gọi `submit_appeal` phải gọi lại `get_appeal_status` ngay bước tiếp theo.
+- **Hàm thuần (pure function)** — không tự gọi LLM, không tự search tài liệu. Mọi `category_scores`/`rubric` do SV3 (qua tool) chuẩn bị sẵn rồi truyền vào — tách bạch để bạn test độc lập, không phụ thuộc SV3 viết server xong trước.
+- **Khung xếp loại không hard-code số** — `rubric` phải chứa cả ngưỡng xếp loại, đọc từ đó.
+- Test riêng ≥3 case: (1) đủ dữ liệu tính bình thường, (2) thiếu 1 mục → lỗi đúng chuẩn, (3) biên giữa 2 mức xếp loại (off-by-one), (4) dữ liệu thật trong `tmp.md` phải ra đúng `total=100, raw_total=103, "Xuất sắc"`.
 
-### 2.7 `prompts/system_agent.txt` và `prompts/grounding_rag.txt`
+### 2.6 `src/common/json_codec.py`
 
-- `system_agent.txt`: mô tả vai trò agent, liệt kê khi nào nên gọi tool nào (ví dụ: câu hỏi quy định → `search_regulations`; câu hỏi tính điểm → `search_regulations` rồi `calculate_conduct_score`; yêu cầu khiếu nại → `submit_appeal` rồi **bắt buộc** `get_appeal_status`), và luật từ chối khi không tìm thấy.
-- `grounding_rag.txt`: chỉ thị "chỉ trả lời dựa trên context được cung cấp dưới đây, nếu không đủ thông tin phải nói rõ 'không tìm thấy', không được suy diễn từ kiến thức khác".
-- Không hard-code 2 prompt này trong code Python — đọc từ file `.txt` lúc runtime (yêu cầu 2.4).
+- `CustomEncoder` cho `json.dumps` xử lý `@dataclass` (dùng `dataclasses.asdict`) và `datetime` — dùng bởi `store.py` (`save()/load()`).
+
+### 2.7 `prompts/grounding_rag.txt`
+
+- Chỉ thị: "chỉ trả lời dựa trên context được cung cấp dưới đây, nếu không đủ thông tin phải nói rõ 'không tìm thấy', không được suy diễn từ kiến thức khác". SV3 đọc file này khi viết tool `search_regulations`/`get_document` để biết format fallback khi không tìm thấy context.
+- Không hard-code trong code Python — đọc từ file `.txt` lúc runtime (yêu cầu 2.4).
 
 ---
 
 ## 3. Interface — bạn cần thống nhất với SV2, SV3
 
 **Bạn expose cho người khác:**
-- Format trả về của `search_regulations`/`get_document` qua MCP: text có kèm `[doc_id]` ở đầu mỗi đoạn — SV2 cần biết format này để tool `calculate_conduct_score` nhận đúng rubric đã trích.
-- Danh sách tool đã discover (in log) — SV3 cần biết tên tool `submit_appeal`/`get_appeal_status` khớp đúng với những gì bạn viết trong `system_agent.txt`.
+- Signature + docstring đầy đủ của `VectorStore.search()`, `hybrid_search.search()`, `scoring.calculate_score()`, `scoring.normalize_category()` — SV3 import trực tiếp các hàm này vào `mcp_server/server.py` để bọc thành tool `search_regulations`, `get_document`, `calculate_conduct_score`.
+- Nội dung `prompts/grounding_rag.txt` — SV3 cần biết format fallback ("Không tìm thấy nội dung liên quan trong tài liệu.") để trả đúng chuỗi đó trong tool.
 
 **Bạn cần nhận từ người khác:**
-- Từ SV2: signature chính xác và format lỗi của `calculate_conduct_score` (để viết đúng hướng dẫn trong `system_agent.txt`).
-- Từ SV3: signature chính xác của `submit_appeal`/`get_appeal_status`, format `appeal_id` trả về (để model biết cách dùng `appeal_id` ở bước verify).
+- Từ SV2: `common/llm_client.py` (file SV2 sở hữu) — bạn gọi `llm_client.embed()` trong `store.embed_all()`. Thống nhất sớm signature hàm `embed(texts: list[str]) -> list[list[float]]`.
+- Từ SV3: format text đầu ra mà tool `search_regulations` cần (ví dụ có kèm `[doc_id]` ở đầu mỗi đoạn hay không) — vì `search()` của bạn trả `list[tuple[DocumentChunk, float]]` (dữ liệu có cấu trúc), còn SV3 mới là người format thành chuỗi text cuối cùng trả qua MCP.
 
 ---
 
 ## 4. Checklist tự kiểm tra trước khi tích hợp
 
-- [ ] `search_regulations` trả đúng đoạn kèm `doc_id` khi hỏi câu trực tiếp
+- [ ] Chunk 2 file quy chế thật, mỗi chunk chứa trọn 1 điều khoản, front-matter không lẫn vào chunk nội dung
 - [ ] Hybrid search trả kết quả khác (và tốt hơn) dense-only cho ít nhất 1 câu test có thuật ngữ/số điều khoản cụ thể
-- [ ] Agent in đúng dòng `Discovered N tools: [...]` lúc khởi động
-- [ ] Hỏi câu ngoài phạm vi corpus → agent từ chối đúng chuẩn, không bịa
-- [ ] Giả lập model trả JSON lỗi (thiếu ngoặc) → loop không crash, log ghi `"Error: ..."`
-- [ ] Giả lập model gọi tool liên tục không dừng → `MAX_STEPS` chặn đúng lúc
-- [ ] `grep -rn "TOOL_REGISTRY\|@dataclass" src/agent/` không ra kết quả registry hard-code nào
+- [ ] `save()/load()` qua `data/store_cache.json` — chạy lần 2 không gọi lại API embedding
+- [ ] `normalize_category()` khớp đúng cả 3 cách viết thật (Điều 4, Điều 5-9, Phụ lục 1, minh chứng SV) về cùng 1 khoá — test bằng chính 5 tên trong `tmp.md`
+- [ ] Cộng đúng dữ liệu thật (27+25+19+30+2 = 103) ra `total = 100`, `raw_total = 103`, "Xuất sắc"
+- [ ] `confirmed=False` trừ đúng 10 điểm vào `raw_total` trước khi chốt trần 100
+- [ ] `calculate_score` trả lỗi rõ ràng khi thiếu dữ liệu, không tự đoán
+- [ ] `grep -n "@dataclass" src/rag/models.py src/domain/scoring.py` ra kết quả
 
 ---
 
 ## 5. Câu hỏi vấn đáp bạn phải trả lời được
 
-- **"Tại sao Agent biết phải gọi tool này?"** → Vì `list_tools()` trả về schema (tên, mô tả, tham số) do server khai báo qua type hint, cộng với `system_agent.txt` mô tả ngữ cảnh khi nào dùng tool nào — model chọn tool dựa trên 2 nguồn đó, không có logic if/else nào trong code quyết định thay model.
-- **"Nếu corpus không có đáp án thì sao?"** → `search_regulations` vẫn được gọi bình thường, trả về điểm similarity thấp hoặc rỗng; grounding prompt buộc model phải nói "không tìm thấy" thay vì dùng kiến thức nền trả lời.
-- **"Nếu tôi sửa `overlap` trong `chunk_document` thì hệ thống thay đổi gì?"** → Tăng overlap giảm rủi ro cắt đứt ý ở ranh giới chunk nhưng tăng số lượng chunk (tăng chi phí embedding + có thể làm loãng kết quả search do nhiều chunk trùng nội dung); phải giải thích được đánh đổi này, không chỉ nói "tăng cho an toàn".
-- **"Nếu tôi đổi `MAX_STEPS` từ 6 xuống 2 thì sao?"** → Các câu hỏi cần nhiều bước (ví dụ search rồi tính điểm rồi khiếu nại) có thể bị cắt giữa chừng, trả về thông báo "vượt quá số bước" dù lẽ ra trả lời được — đây là đánh đổi giữa an toàn (chặn lặp vô hạn) và khả năng hoàn thành tác vụ phức tạp.
+- **"Nếu tôi sửa `overlap` trong `chunk_document` thì hệ thống thay đổi gì?"** → Tăng overlap giảm rủi ro cắt đứt ý ở ranh giới chunk nhưng tăng số lượng chunk (tăng chi phí embedding + có thể làm loãng kết quả search do nhiều chunk trùng nội dung).
+- **"Vì sao chọn hybrid (BM25 + dense) thay vì chỉ dense?"** → Văn bản quy chế có nhiều số điều khoản, thuật ngữ cụ thể ("Điều 10", "Phụ lục 1") mà dense embedding dễ bỏ sót (embedding tối ưu cho nghĩa, không tối ưu cho khớp từ khoá chính xác); BM25 bù lại phần đó.
+- **"Vì sao 5 mục cộng lại có thể vượt 100 mà điểm cuối vẫn phải là 100?"** → Mỗi mục có trần "vượt khung" riêng (mục I tối đa 30, mục IV tối đa 38...), cộng dồn lý thuyết của cả 5 trần vượt quá 100, nhưng Điều 4.2 quy định điểm rèn luyện đánh giá theo khung 100 — nên sau khi cộng phải chốt `min(raw_total, 100)`. Phát hiện từ đối chiếu bảng điểm thật (103 → 100), không đọc thấy trực tiếp trong văn bản.
+- **"Nếu corpus không có đáp án thì sao?"** → `search()`/`hybrid_search.search()` vẫn trả về bình thường (điểm similarity thấp hoặc rỗng) — việc quyết định "từ chối" nằm ở `grounding_rag.txt` + cách SV3 format khi không có kết quả đủ tốt, không phải logic trong file của bạn.
