@@ -71,15 +71,19 @@ def log_step(
     run_id: str,
     question_id: str,
     step_index: int,
-    step_type: str,  # "tool_call" | "tool_result" | "final_answer"
+    step_type: str,  # "llm_call" | "tool_call" | "tool_result" | "final_answer" | "error"
     tool_name: str | None,
     args: dict | None,
     result: str | None,
-    usage: dict
-    | None,  # {"calls": int, "prompt_tokens": int, "completion_tokens": int}
+    usage: dict | None,  # CHỈ điền khi step_type == "llm_call":
+    # {"calls": 1, "prompt_tokens": int, "completion_tokens": int}
+    # None ở mọi step_type khác
 ) -> None:
-    """Append 1 dòng JSON vào logs/run_<run_id>.jsonl. Gọi bởi agent/loop.py
-    (của SV1) ở mỗi bước của vòng lặp."""
+    """Append 1 dòng JSON vào logs/run_<run_id>.jsonl, tự sinh thêm field "timestamp"
+    (ISO 8601, UTC). Gọi bởi agent/loop.py (của SV1) ở MỌI lần gọi LLM (step_type=
+    "llm_call") và mọi tool_call/tool_result/final_answer/error. Format 5 step_type
+    này đã chốt trong interface-contract.md — đổi field name ở đây phải báo SV2 vì
+    evaluate.py đọc trực tiếp."""
 ```
 
 - **Thống nhất tên field với SV2 TRƯỚC KHI viết `evaluate.py`** — `evaluate.py` đọc trực tiếp các field này để tính tổng usage/câu, đổi tên field giữa chừng sẽ làm hỏng cả 2 phía.
@@ -123,6 +127,7 @@ def log_step(
 - [ ] Chạy thử 1 câu hỏi khiếu nại qua agent thật, xác nhận trace in ra đủ cặp `submit_appeal` → `get_appeal_status` như mục 3
 - [ ] `logs/run_*.jsonl` sinh đúng 1 file mới mỗi lần `make demo` chạy xong, không ghi đè file cũ
 - [ ] `grep -n "@dataclass\|TypedDict" src/domain/appeals_store.py` ra kết quả
+- [ ] Mỗi dòng `step_type == "llm_call"` có `usage` đủ 3 field; mọi `step_type` khác có `usage: null`
 
 ---
 

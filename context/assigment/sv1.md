@@ -19,7 +19,7 @@ Bạn chịu trách nhiệm toàn bộ đường đi từ câu hỏi của ngư�
 
 **File bạn góp phần (chung với SV2, SV3):**
 - `src/mcp_server/server.py` — bạn viết đúng 2 tool: `search_regulations`, `get_document`
-- `data/source_docs/` — chuẩn bị corpus quy chế (cả nhóm cùng viết, bạn chủ trì vì cần hiểu rõ nhất để test retrieval)
+- `data/source_docs/` — corpus đã chốt còn 2 file: `quy_dinh_diem_ren_luyen.md` (DOC0001) và `so_tay_sinh_vien.md` đã trích lọc 3 mục liên quan (DOC0002). Mỗi file có sẵn front-matter YAML (`doc_id`, `title`, `version`, `date`, `owner`) ở đầu — `chunking.py` phải tách khối này ra trước khi áp regex Điều/Mục, rồi parse thành `Document.metadata`, không coi nó là 1 chunk nội dung. Lưu ý: `version` 2 file khác nhau (2021 vs 2024) KHÔNG phải tình huống quy chế mâu thuẫn thật (số liệu giống nhau) — chỉ là 2 loại nguồn khác nhau (văn bản gốc vs sổ tay tóm tắt), chưa có tài liệu nào đóng vai "bản đã điều chỉnh" để test version-conflict.
 
 ---
 
@@ -72,6 +72,7 @@ def chunk_document(
 - Viết đúng docstring 3-5 dòng như trên (hoặc tương đương) — dùng trực tiếp cho report mục 3, không được bỏ.
 - Regex gợi ý: `r"(?:^|\n)(Điều\s+\d+|Mục\s+\d+)"` để tìm điểm cắt.
 - Test bắt buộc: chunk 1 file quy chế thật, in ra để xác nhận mỗi chunk chứa trọn 1 điều khoản, không bị cắt giữa chừng.
+- **Bắt buộc xử lý front-matter trước khi chunk:** mỗi file nguồn bắt đầu bằng khối `---\n...\n---` chứa `doc_id/title/version/date/owner` — parse riêng khối này (ví dụ `yaml.safe_load` hoặc tách thủ công theo dòng `---`), gán vào `Document`, rồi mới chạy regex Điều/Mục trên phần nội dung còn lại.
 
 ### 2.3 `src/rag/store.py`
 

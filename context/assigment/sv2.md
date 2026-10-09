@@ -21,23 +21,43 @@ Bạn chịu trách nhiệm phần "có việc để đo" của đề bài: tín
 
 ### 2.1 `src/domain/scoring.py`
 
+Đọc `category-mapping.md` trước khi viết file này — bảng ánh xạ 5 khoá chuẩn dùng xuyên suốt `category_scores`/`rubric`/`breakdown`, tránh so khớp nhầm giữa các cách viết khác nhau của cùng 1 mục (Điều 4 vs Phụ lục 1 vs minh chứng SV).
+
 ```python
 @dataclass
 class ScoreResult:
-    total: int
+    raw_total: int  # tổng 5 mục trước khi chốt trần — có thể > 100
+    total: int  # min(raw_total, 100) theo Điều 4.2 — dùng để xếp loại
     classification: str
-    breakdown: dict[str, int]
+    breakdown: dict[str, int]  # key = khoá chuẩn, xem category-mapping.md
     missing_categories: list[str] = field(default_factory=list)
+    confirmed_deduction_applied: bool = False
 
 
-def calculate_score(category_scores: dict[str, int], rubric: dict) -> ScoreResult | str:
+def normalize_category(raw_name: str) -> str:
+    """Map tên mục thô (trích từ Điều 4/Điều 5-9/Phụ lục 1/minh chứng SV) về 1 trong
+    5 khoá chuẩn — xem bảng đầy đủ trong category-mapping.md. So khớp theo substring,
+    không phân biệt hoa/thường, không so khớp chuỗi chính xác (cách viết thật có thêm
+    "(vượt khung không quá N điểm)" phía sau tên mục)."""
+
+
+def calculate_score(
+    category_scores: dict[str, int], rubric: dict, confirmed: bool = True
+) -> ScoreResult | str:
     """
-    Cộng tổng điểm các mục, đối chiếu khung xếp loại LẤY TỪ `rubric`
-    (do agent trích từ quy chế qua search_regulations, không hard-code
-    ngưỡng xếp loại trong code — quy chế đổi thì không phải sửa code).
-    Nếu thiếu dữ liệu 1 mục trong category_scores, trả về chuỗi
-    "Error: thiếu dữ liệu mục '<tên mục>' — không thể tính điểm"
-    thay vì tự suy đoán hoặc bỏ qua mục đó.
+    Cộng tổng điểm 5 mục (key đã qua normalize_category), đối chiếu khung xếp loại
+    LẤY TỪ `rubric` (agent trích từ quy chế, không hard-code ngưỡng trong code).
+
+    Nếu thiếu dữ liệu 1 mục: trả "Error: thiếu dữ liệu mục '<tên mục>' — không thể
+    tính điểm", không tự suy đoán hay bỏ qua.
+
+    Nếu confirmed=False (SV không xác nhận điểm rèn luyện — Điều 12.3): trừ 10 điểm
+    vào raw_total trước khi chốt trần.
+
+    total PHẢI chốt trần ở 100 (min(raw_total, 100)) — 5 mục cộng đúng luật vẫn có
+    thể vượt 100 trên thực tế (dữ liệu thật: 27+25+19+30+2 = 103 → chốt 100, Xuất
+    sắc). Quy tắc này không file quy định nào viết tường minh thành công thức — chỉ
+    phát hiện được khi đối chiếu với bảng điểm thật (Điều 4.2 chỉ nói "khung 100").
     """
 ```
 
@@ -104,6 +124,9 @@ Mỗi dòng tối thiểu:
 - [ ] Phát hiện đúng ≥4 câu `no_answer` là từ chối đúng (không bị tính nhầm là sai)
 - [ ] Có bảng/biểu đồ so sánh dense vs hybrid
 - [ ] `grep -n "@dataclass\|TypedDict" src/domain/scoring.py` ra kết quả (không dùng dict thô)
+- [ ] `normalize_category()` khớp đúng cả 3 cách viết thật (Điều 4, Điều 5-9, Phụ lục 1, minh chứng SV) về cùng 1 khoá — test bằng chính 5 tên trong `tmp.md`
+- [ ] Cộng đúng dữ liệu thật (27+25+19+30+2 = 103) ra `total = 100`, `raw_total = 103`, xếp loại "Xuất sắc"
+- [ ] `confirmed=False` trừ đúng 10 điểm vào `raw_total` trước khi chốt trần 100
 
 ---
 
@@ -113,3 +136,4 @@ Mỗi dòng tối thiểu:
 - **"Faithfulness đo cái gì, không đo cái gì?"** → Đo mức độ câu trả lời bám vào context đã retrieve được, không đo câu trả lời có đúng theo quy chế thật áp dụng ngoài đời hay không (nếu corpus lỗi thời, faithfulness vẫn có thể cao dù sai thực tế).
 - **"Tỉ lệ từ chối đúng tính thế nào, và vì sao cần tách riêng khỏi faithfulness?"** → Câu `no_answer` không có context để chấm faithfulness (không có gì để "bám vào"), nên phải đo riêng bằng cách kiểm câu trả lời có đúng pattern từ chối hay không — gộp chung 2 metric sẽ làm sai lệch cả hai.
 - **"Nếu corpus không có đáp án thì sao?"** (áp dụng cho tầng (b) khi thiếu dữ liệu để tính) → Phân biệt 2 loại từ chối: (i) tài liệu không đề cập (lỗi khâu truy vấn, thuộc SV1) và (ii) có tài liệu nhưng thiếu dữ liệu để suy luận/tính toán (lỗi khâu biến đổi, thuộc bạn) — `calculate_score` phải trả đúng loại (ii), không lẫn với (i).
+- **"Vì sao 5 mục cộng lại có thể vượt 100 mà điểm cuối vẫn phải là 100?"** → Mỗi mục có trần "vượt khung" riêng (mục I tối đa 30, mục IV tối đa 38...), cộng dồn lý thuyết của cả 5 trần vượt quá 100, nhưng Điều 4.2 quy định điểm rèn luyện đánh giá theo khung 100 — nên sau khi cộng phải chốt `min(raw_total, 100)`. Phát hiện từ đối chiếu bảng điểm thật (103 → 100), không đọc thấy trực tiếp trong văn bản.
