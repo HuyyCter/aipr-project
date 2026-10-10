@@ -1,0 +1,11 @@
+2026-10-10 08:30:33,384 INFO __main__: Hàm hello() được gọi bởi 'Huy'
+2026-10-10 08:30:34,455 INFO mcp.server.mcpserver.server: Tool 'khong_ton_tai' failed: 'Unknown tool: khong_ton_tai'
+2026-10-10 09:58:01,660 INFO mcp.server.mcpserver.server: Tool 'hello' rejected arguments: ['name']
+2026-10-10 09:58:39,116 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
+2026-10-10 09:58:39,117 ERROR src.aipr_project.domain.appeals_store: submit_appeal: không ghi được file D:\Coding\programming-language\python\ai-programming\aipr-project\data\appeals.jsonl: [WinError 183] Cannot create a file when that file already exists: 'D:\\Coding\\programming-language\\python\\ai-programming\\aipr-project\\data\\appeals.jsonl'
+2026-10-10 10:01:38,550 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
+2026-10-10 10:01:38,552 ERROR src.aipr_project.domain.appeals_store: submit_appeal: không ghi được file D:\Coding\programming-language\python\ai-programming\aipr-project\data\appeals.jsonl: [WinError 183] Cannot create a file when that file already exists: 'D:\\Coding\\programming-language\\python\\ai-programming\\aipr-project\\data\\appeals.jsonl'
+2026-10-10 10:02:02,674 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
+2026-10-10 10:02:02,675 ERROR __main__: submit_appeal() lỗi
+2026-10-10 10:04:16,514 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
+2026-10-10 10:06:30,537 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
