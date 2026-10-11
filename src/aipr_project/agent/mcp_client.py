@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 import sys
 from contextlib import AsyncExitStack
 from pathlib import Path
@@ -58,18 +59,30 @@ async def main():
             print(f"    + schema: {tool.input_schema}\n")
 
         # CALL TOOLS
+        # GHI -> VERIFY
         print("\n" + "=" * 60)
-        print(
-            await call(
-                session,
-                "submit_appeal",
-                {
-                    "student_id": "24110095",
-                    "reason": "Điểm rèn luyện ngày 6/10/2026 chưa được cộng",
-                    "category": "tham_gia_su_kien",
-                },
-            )
+        submitted = await call(
+            session,
+            "submit_appeal",
+            {
+                "student_id": "SV001",
+                "reason": "Thiếu minh chứng hoạt động tình nguyện",
+                "category": "chinh_tri_xa_hoi",
+            },
         )
+        print(submitted)
+
+        match = re.search(r"#(\w+)", submitted)
+        if match:
+            print(
+                await call(session, "get_appeal_by_id", {"appeal_id": match.group(1)})
+            )
+
+        # id không tồn tại -> phải ra "Error: ...", không crash
+        print(await call(session, "get_appeal_by_id", {"appeal_id": "khongco"}))
+
+        print(await call(session, "list_appeals", {"student_id": "SV001"}))
+        print(await call(session, "list_appeals", {"student_id": "Huy"}))
     finally:
         await close()
 

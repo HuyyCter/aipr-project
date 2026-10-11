@@ -9,3 +9,26 @@
 2026-10-10 10:02:02,675 ERROR __main__: submit_appeal() lỗi
 2026-10-10 10:04:16,514 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
 2026-10-10 10:06:30,537 INFO __main__: submit_appeal() được gọi: student_id='24110095', category='tham_gia_su_kien'
+2026-10-11 10:03:00,858 INFO mcp.server.mcpserver.server: Tool 'submit_appeal' rejected arguments: ['category']
+2026-10-11 10:03:00,865 INFO mcp.server.mcpserver.server: Tool 'get_appeal_status' failed: 'Unknown tool: get_appeal_status'
+2026-10-11 10:03:42,519 INFO mcp.server.mcpserver.server: Tool 'submit_appeal' rejected arguments: ['category']
+2026-10-11 10:03:42,525 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-11 10:03:42,527 ERROR mcp.server.mcpserver.server: Tool 'get_appeal_by_id' raised an unexpected exception
+2026-10-11 10:08:07,607 INFO mcp.server.mcpserver.server: Tool 'submit_appeal' rejected arguments: ['category']
+2026-10-11 10:08:07,611 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-11 10:09:19,142 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-11 10:09:19,287 INFO __main__: get_appeal_by_id() được gọi: appeal_id='18f41e7c'
+2026-10-11 10:09:19,317 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-11 10:11:36,037 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-11 10:11:36,176 INFO __main__: get_appeal_by_id() được gọi: appeal_id='2eb11d52'
+2026-10-11 10:11:36,202 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-11 10:32:45,427 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-11 10:32:45,570 INFO __main__: get_appeal_by_id() được gọi: appeal_id='56025229'
+2026-10-11 10:32:45,599 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-11 10:32:45,604 INFO mcp.server.mcpserver.server: Tool 'list_appeals' failed: 'Unknown tool: list_appeals'
+2026-10-11 10:32:45,607 INFO mcp.server.mcpserver.server: Tool 'list_appeals' failed: 'Unknown tool: list_appeals'
+2026-10-11 10:33:08,087 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-11 10:33:08,232 INFO __main__: get_appeal_by_id() được gọi: appeal_id='4be2adaf'
+2026-10-11 10:33:08,256 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-11 10:33:08,260 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-11 10:33:08,267 INFO __main__: list_appeals() được gọi: student_id='Huy'

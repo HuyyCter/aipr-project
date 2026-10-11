@@ -66,5 +66,52 @@ def submit_appeal(student_id: str, reason: str, category: str) -> str:
         return f"Error: Không nộp được đơn thiếu nại: {error}"
 
 
+@mcp_server.tool()
+def get_appeal_by_id(appeal_id: str) -> str:
+    """
+    Tra cứu một hồ sơ khiếu nại theo mã. Đây là tool ĐỌC, dùng để xác nhận
+    hồ sơ đã thực sự được lưu (ví dụ ngay sau khi gọi submit_appeal) hoặc để
+    kiểm tra trạng thái hồ sơ.
+
+    Args:
+        appeal_id: Mã hồ sơ, lấy từ kết quả của submit_appeal,
+            ví dụ "a1b2c3d4" (có hoặc không có dấu "#" đều được).
+
+    Returns:
+        "Khiếu nại #<appeal_id> — <student_id> — <status> — nộp lúc <timestamp>".
+        Không tìm thấy hoặc lỗi thì trả chuỗi bắt đầu bằng "Error: ".
+    """
+    log.info("get_appeal_by_id() được gọi: appeal_id=%r", appeal_id)
+    try:
+        return Appeal.get_appeal_by_id(appeal_id)
+    except Exception as error:
+        log.error(f"get_appeal_by_id() lỗi: {error}")
+        return f"Error: Không đọc được đơn thiếu nại: {error}"
+
+
+@mcp_server.tool()
+def list_appeals(student_id: str) -> str:
+    """
+    Liệt kê các khiếu nại đã nộp của một sinh viên (mới nhất trước, tối đa 10
+    hồ sơ). Đây là tool ĐỌC. Dùng khi sinh viên hỏi mình đã nộp những khiếu
+    nại nào, hoặc khi cần tìm lại mã hồ sơ mà không nhớ. Nếu đã biết mã hồ sơ
+    thì dùng get_appeal_status.
+
+    Args:
+        student_id: Mã sinh viên, ví dụ "SV001".
+
+    Returns:
+        Mỗi hồ sơ một dòng gồm mã, mục điểm bị khiếu nại, trạng thái, thời
+        điểm nộp. Chưa có hồ sơ nào thì trả câu thông báo bình thường. Lỗi
+        thì trả chuỗi bắt đầu bằng "Error: ".
+    """
+    log.info("list_appeals() được gọi: student_id=%r", student_id)
+    try:
+        return Appeal.list_appeals(student_id)
+    except Exception as error:
+        log.error(f"list_appeals() lỗi: {error}")
+        return f"Error: Không đọc được danh sách đơn thiếu nại: {error}"
+
+
 if __name__ == "__main__":
     mcp_server.run()
