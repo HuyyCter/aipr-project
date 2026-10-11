@@ -27,22 +27,33 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 
 ---
 
-## SV2 — Tầng (b) Biến đổi + Evaluation
+## SV2 — Agent Loop (W6) + Evaluation (W5) + LLM Client (W2)
 
-**Công cụ AI đã dùng:** _____
+**Công cụ AI đã dùng:** Antigravity (Google Gemini)
 
 **Dùng cho phần nào:**
-- [ ] `domain/scoring.py`
+- [x] Lên kế hoạch lộ trình tiến độ, phân kỳ mốc merge code (`context/roadmap-sv2.md`)
+- [ ] `agent/loop.py`
+- [ ] `agent/logger.py`
 - [ ] `eval/evaluate.py`
+- [x] `common/llm_client.py`
 - [ ] `tests/testset.jsonl`
-- [ ] Khác: ___
+- [ ] `prompts/system_agent.txt`
 
 **Prompt chính đã dùng:**
-```
-(điền sau)
+```text
+1. Overview du an, toi thuc hien voi tu cach la sv2, nhung cong viec se lam va pham vi kien thuc, check trong thu muc me aipr
+2. Tao giup toi mot file local md de chia giai doan cac viec cua sv2 de theo doi tien do, khi nao nen hoan thanh file, khi nao can merge code voi thanh vien khac. Cap nhat ban da lam len ai-usage.md cua sv2
+3. cap nhat them phan nao lien quan den file tai lieu mau nao trong roadmap-sv2
+4. toi muon hoi ham embed() trong llm_client, input la mot list toi co nen tach them embed_text va batch_embed_text nhu w3 hay khong. Toi du tinh su dung jina_embedding nhu w3 hay viet lai, trong context co quy dinh ve them file vao khong va co nen lam the khong
+5. Giup toi viet ham chat() trong llm_client nhung toi khong muon xai qua nhieu model va viet them 1 ham main/chuong trinh de test. Ghi phan nay vao ai-usage
 ```
 
-**Đoạn code nào do AI sinh (vs tự viết):**
+**Đoạn code nào do AI sinh (vs tự viết):** 
+- AI hỗ trợ phân tích yêu cầu từ các file context, lập kế hoạch chi tiết 4 giai đoạn thực hiện, các mốc merge code, và xây dựng bảng ánh xạ trực tiếp từng đầu việc SV2 với các file tài liệu mẫu trong `context/roadmap-sv2.md`.
+- Trong `src/aipr_project/common/llm_client.py`:
+  + Tự viết: Kế thừa hàm `_jina_embeddings` và cấu trúc `embed()` từ lab Week 3, tích hợp vào `LLMClient`.
+  + AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b` (kế thừa từ W2/W6), xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP (ngắt khi 401/403/404, retry khi 429/5xx), ghi log lỗi ra `sys.stderr` theo Yêu cầu 2.4, và viết khối `if __name__ == "__main__":` kiểm thử end-to-end cả chat thường, chat tool-calling và embedding.
 
 ---
 

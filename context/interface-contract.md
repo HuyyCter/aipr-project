@@ -6,7 +6,7 @@ File này là "hợp đồng" giữa 3 module — đổi bất kỳ field/format
 
 ## 1. Format log — `logs/run_<run_id>.jsonl`
 
-Người ghi: SV3 (`agent/logger.py`), người gọi: SV1 (`agent/loop.py`), người đọc: SV2 (`eval/evaluate.py`).
+Người ghi: SV2 (`agent/logger.py`), người gọi: SV2 (`agent/loop.py`), người đọc: SV2 (`eval/evaluate.py`).
 
 Mỗi dòng là 1 object JSON độc lập (JSONL — không phải 1 mảng lớn):
 
@@ -38,7 +38,7 @@ Mỗi dòng là 1 object JSON độc lập (JSONL — không phải 1 mảng l�
 
 **Quy tắc tính usage cho 1 câu hỏi (SV2 dùng trong `evaluate.py`):** gộp tất cả dòng có `question_id` trùng và `step_type == "llm_call"`, cộng `calls`/`prompt_tokens`/`completion_tokens`. Không tính usage từ các step khác.
 
-**Ví dụ 1 chuỗi đầy đủ cho 1 câu hỏi khiếu nại** (tham khảo cho SV1 viết `loop.py` và SV3 viết `logger.py`):
+**Ví dụ 1 chuỗi đầy đủ cho 1 câu hỏi khiếu nại** (SV2 gọi trong `loop.py` và ghi qua `logger.py`):
 
 ```json
 {"run_id": "20261008-143000", "question_id": "q09", "step_index": 0, "timestamp": "...", "step_type": "llm_call", "tool_name": null, "args": null, "result": null, "usage": {"calls": 1, "prompt_tokens": 600, "completion_tokens": 30}}
@@ -102,6 +102,47 @@ Không tồn tại: `"Error: không tìm thấy hồ sơ khiếu nại #<appeal_
 
 ---
 
-## 4. Khi muốn đổi field/format ở đây
+## 4. Hợp đồng Python nội bộ giữa 3 thành viên
+
+### 4.1 `common/llm_client.py` (SV2 sở hữu $\rightarrow$ bàn giao SV1 & SV3)
+- **Model chuẩn thống nhất cả nhóm:**
+  - LLM Chat: `DEFAULT_MODEL = "openai/gpt-oss-20b"` (Groq)
+  - Embedding: `DEFAULT_EMBED_MODEL = "jina-embeddings-v3"` (Jina AI)
+- **Signature hàm embed:**
+  ```python
+  def embed(self, texts: list[str], model: str = "jina-embeddings-v3", task: str = "retrieval.passage") -> list[list[float]]
+  ```
+  - *Quy ước:* SV1 gọi hàm này trong `store.embed_all()` để embed chunk (task="retrieval.passage"). Khi query search câu hỏi thì truyền task="retrieval.query" và lấy `[0]`.
+- **Signature hàm chat:**
+  ```python
+  def chat(self, messages: list[dict], tools: list[dict] | None = None, temperature: float = 0.0) -> Any
+  ```
+  - Trả về đối tượng completion có `response.choices[0].message` và `response.usage`.
+
+### 4.2 `agent/mcp_client.py` (SV3 sở hữu $\rightarrow$ bàn giao SV2)
+- SV2 (`agent/loop.py`) gọi vào MCP client của SV3 qua 2 hàm:
+  ```python
+  def discover(session) -> list[dict]:
+      """Lấy danh sách tool schema động để truyền vào LLMClient.chat(tools=...)."""
+
+  def call(session, tool_name: str, args: dict) -> str:
+      """Gọi tool qua MCP stdio, trả về chuỗi text kết quả (hoặc 'Error: ...')."""
+  ```
+
+### 4.3 `rag/*` & `domain/*` (SV1 sở hữu $\rightarrow$ bàn giao SV3)
+- SV3 bọc các hàm nội bộ của SV1 thành 5 tool MCP trong `server.py`:
+  ```python
+  # Từ rag/store.py và rag/hybrid_search.py:
+  store.search(query: str, top_k: int = 3) -> list[tuple[DocumentChunk, float]]
+  hybrid_search.search(query: str, top_k: int = 3, mode: str = "hybrid") -> list[tuple[DocumentChunk, float]]
+
+  # Từ domain/scoring.py:
+  scoring.calculate_score(category_scores: dict[str, int], rubric: dict, confirmed: bool = True) -> ScoreResult | str
+  scoring.normalize_category(raw_name: str) -> str
+  ```
+
+---
+
+## 5. Khi muốn đổi field/format ở đây
 
 Báo trong nhóm chat trước, không tự đổi âm thầm — vì cả 3 file (`loop.py`, `logger.py`, `evaluate.py`, và tất cả tool trong `server.py`) đều đọc đúng những gì được định nghĩa ở file này.
