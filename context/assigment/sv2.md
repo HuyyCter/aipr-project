@@ -154,7 +154,7 @@ Mỗi dòng tối thiểu:
 - [ ] `make eval` chạy hết `testset.jsonl` không crash, xuất CSV đủ cột
 - [ ] Phát hiện đúng ≥4 câu `no_answer` là từ chối đúng (không bị tính nhầm là sai)
 - [ ] Có bảng/biểu đồ so sánh dense vs hybrid
-- [ ] `llm_client.chat()` retry đúng khi rate-limit, KHÔNG retry khi sai key
+- [x] `llm_client.chat()` retry đúng khi rate-limit, KHÔNG retry khi sai key (đã kiểm thử và chạy OK)
 - [ ] `grep -rn "TOOL_REGISTRY" src/agent/` không ra kết quả registry hard-code nào
 
 ---
