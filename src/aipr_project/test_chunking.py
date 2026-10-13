@@ -1,7 +1,5 @@
-
-from aipr_project.rag.models import Document
 from aipr_project.rag.chunking import chunk_document
-
+from aipr_project.rag.models import Document
 
 document = Document(
     doc_id="DRL001",

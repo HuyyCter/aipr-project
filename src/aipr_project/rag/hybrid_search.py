@@ -1,8 +1,7 @@
-
 from rank_bm25 import BM25Okapi
+from w3.jina_embeddings import cosine_similiarity, embed_key
 
 from aipr_project.rag.models import DocumentChunk
-from w3.jina_embeddings import embed_key, cosine_similiarity
 
 
 def normalise_scores(scores: list[float]) -> list[float]:
@@ -15,10 +14,7 @@ def normalise_scores(scores: list[float]) -> list[float]:
     if min_score == max_score:
         return [1.0] * len(scores)
 
-    return [
-        (score - min_score) / (max_score - min_score)
-        for score in scores
-    ]
+    return [(score - min_score) / (max_score - min_score) for score in scores]
 
 
 def build_bm25_index(chunks: list[DocumentChunk]) -> BM25Okapi:
@@ -41,10 +37,7 @@ def hybrid_search(
     bm25_scores = list(bm25_index.get_scores(query.lower().split()))
     query_vector = embed_key(query)
 
-    vector_scores = [
-        cosine_similiarity(query_vector, vector)
-        for vector in embeddings
-    ]
+    vector_scores = [cosine_similiarity(query_vector, vector) for vector in embeddings]
 
     bm25_scores = normalise_scores(bm25_scores)
 
