@@ -38,6 +38,8 @@ def normalize_category(raw_name: str) -> str:
     raise ValueError (calculate_score bắt lại và đổi thành "Error: ...").
     """
     name = raw_name.strip().lower()
+    if name in CATEGORIES:
+        return name
     for key, keywords in _KEYWORDS:
         if any(keyword in name for keyword in keywords):
             return key
@@ -55,7 +57,7 @@ def classify(total: int, rubric: dict) -> str:
 
 
 def calculate_score(
-    category_scores: dict[str, int], rubric: dict, confirmed: bool = True
+    category_scores: dict[str, int], rubric: dict, confirmed: bool = False
 ) -> ScoreResult | str:
     """
     Cộng điểm 5 mục, trừ điểm nếu chưa xác nhận, chốt trần 100, xếp loại.
@@ -89,10 +91,10 @@ def calculate_score(
     limits: dict[str, int] = rubric.get("limits", {})
     breakdown: dict[str, int] = {}
     for key in CATEGORIES:
-        current_score = max(normalized_category.get(key), 0)
+        score = max(normalized_category.get(key), 0)
         if key in limits:
             max_score = limits.get(key)
-            score = min(current_score, max_score)
+            score = min(score, max_score)
         breakdown[key] = score
 
     # B4: Tính tổng điểm

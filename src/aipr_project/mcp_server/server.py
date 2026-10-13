@@ -7,7 +7,13 @@ from mcp.server.mcpserver import MCPServer
 
 from aipr_project.domain.appeals_store import Appeal
 from aipr_project.domain.scoring import *
-from aipr_project.rag.hybrid_search import rag_search
+from aipr_project.rag.build_index import (
+    DOCS_DIR,
+    INDEX_DIR,
+    SOURCE_FILES,
+    read_document,
+)
+from aipr_project.rag.hybrid_search import build_bm25_index, hybrid_search
 from aipr_project.rag.models import DocumentChunk
 from aipr_project.rag.store import DocumentStore
 
@@ -20,9 +26,6 @@ MAX_DOCUMENT_CHARS = 800
 
 with open(RUBRIC_PATH, "r", encoding="utf-8") as f:
     RUBRIC = json.load(f)
-print(RUBRIC)
-
-STORE = load_store()
 
 
 # ==================== HELPERS ====================
@@ -37,7 +40,7 @@ def _format_score(result: ScoreResult) -> str:
     ]
     if result.raw_total != result.total:
         lines.append(f"(tổng thô {result.raw_total}, đã chốt trần {result.total})")
-    if result.confirmed_score:
+    if not result.confirmed_score:
         lines.append(
             f"(đã trừ {UNCONFIRMED_PENALTY} điểm vì chưa xác nhận điểm rèn luyện)"
         )
@@ -61,6 +64,29 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s: %(message)s",
 )
 log = logging.getLogger(__name__)
+
+
+# ==================== LOAD RAG ====================
+def _load_store() -> DocumentStore:
+    store = DocumentStore()
+    for name in SOURCE_FILES:
+        store.add(read_document(DOCS_DIR / name))
+    return store
+
+
+def _load_index() -> tuple[list[DocumentChunk], list[list[float]]]:
+    index_path = INDEX_DIR / "index.json"
+    if not index_path.exists():
+        raise FileNotFoundError(f"Chưa có {index_path}. Chạy build_index.py trước.")
+    data = json.loads(index_path.read_text(encoding="utf-8"))
+    chunks = [DocumentChunk(**c) for c in data["chunks"]]
+    return chunks, data["embeddings"]
+
+
+STORE = _load_store()
+CHUNKS, EMBEDDINGS = _load_index()
+BM25 = build_bm25_index(CHUNKS)
+log.info("RAG loaded: %d chunks, %s", len(CHUNKS), STORE.count())
 
 
 # ==================== MCP SERVER ====================
@@ -94,12 +120,12 @@ def search_regulations(query: str, top_k: int = 3) -> str:
             return "Error: query không được rỗng."
 
         top_k = max(1, min(top_k, 8))
-        result = rag_search.search(query, top_k)
+        result = hybrid_search(query, CHUNKS, EMBEDDINGS, BM25, top_k=top_k)
         if not result:
             return NOT_FOUND_MESSAGE
         return "\n=============\n".join(
             f"{_header(chunk.doc_id, chunk.title, chunk.version, chunk.date)}\n{chunk.content}"
-            for chunk, score in result
+            for chunk in (CHUNKS[i] for i, _ in result)
         )
     except Exception as error:
         log.error(f"search_regulations() lỗi: {error}")
@@ -141,7 +167,7 @@ def get_document(doc_id: str) -> str:
 
 @mcp_server.tool()
 def calculate_conduct_score(
-    category_scores: dict[str, int], confirmed: bool = True
+    category_scores: dict[str, int], confirmed: bool = False
 ) -> str:
     """
     Tính tổng điểm rèn luyện và xếp loại. Đây là tool TÍNH TOÁN: luôn dùng nó để
@@ -154,7 +180,7 @@ def calculate_conduct_score(
             5 khóa: "hoc_tap", "chap_hanh_noi_quy", "chinh_tri_xa_hoi",
             "pham_chat_cong_dan", "cong_tac_lop_doan_hoi".
         confirmed: False nếu sinh viên chưa xác nhận điểm rèn luyện trên hệ thống
-            (bị trừ 10 điểm), mặc định True.
+            (bị trừ 10 điểm), mặc định False.
 
     Returns:
         Tổng điểm, xếp loại và điểm từng mục. Lỗi thì trả chuỗi bắt đầu bằng "Error: ".
@@ -166,6 +192,8 @@ def calculate_conduct_score(
     )
     try:
         result = calculate_score(category_scores, RUBRIC, confirmed)
+        if isinstance(result, str):
+            return result
         return _format_score(result)
     except Exception as error:
         log.error(f"calculate_conduct_score() lỗi: {error}")
