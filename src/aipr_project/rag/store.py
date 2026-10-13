@@ -1,6 +1,5 @@
-
-from aipr_project.rag.models import Document, DocumentChunk
 from aipr_project.rag.chunking import chunk_documents
+from aipr_project.rag.models import Document, DocumentChunk
 
 
 class DocumentStore:
@@ -48,11 +47,7 @@ class DocumentStore:
         return self._chunks.get(chunk_id)
 
     def get_chunk_by_doc(self, doc_id: str) -> list[DocumentChunk]:
-        return [
-            chunk
-            for chunk in self._chunks.values()
-            if chunk.doc_id == doc_id
-        ]
+        return [chunk for chunk in self._chunks.values() if chunk.doc_id == doc_id]
 
     def count(self) -> dict[str, int]:
         return {

@@ -1,0 +1,36 @@
+{
+    "source": "quy_dinh_diem_ren_luyen.md — Điều 10 (xếp loại), Phụ lục 1 (trần từng mục). Quy chế đổi thì sửa tay file này.",
+    "classification": [
+        {
+            "min": 90,
+            "label": "Xuất sắc"
+        },
+        {
+            "min": 80,
+            "label": "Tốt"
+        },
+        {
+            "min": 65,
+            "label": "Khá"
+        },
+        {
+            "min": 50,
+            "label": "Trung bình"
+        },
+        {
+            "min": 35,
+            "label": "Yếu"
+        },
+        {
+            "min": 0,
+            "label": "Kém"
+        }
+    ],
+    "limits": {
+        "hoc_tap": 30,
+        "chap_hanh_noi_quy": 25,
+        "chinh_tri_xa_hoi": 30,
+        "pham_chat_cong_dan": 38,
+        "cong_tac_lop_doan_hoi": 15
+    }
+}

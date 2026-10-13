@@ -1,4 +1,3 @@
-
 from rank_bm25 import BM25Okapi
 
 from aipr_project.rag.models import DocumentChunk
@@ -20,10 +19,7 @@ def normalise_scores(scores: list[float]) -> list[float]:
     if max_score == min_score:
         return [1.0] * len(scores)
 
-    return [
-        (score - min_score) / (max_score - min_score)
-        for score in scores
-    ]
+    return [(score - min_score) / (max_score - min_score) for score in scores]
 
 
 def build_bm25_index(chunks: list[DocumentChunk]) -> BM25Okapi:
@@ -32,10 +28,7 @@ def build_bm25_index(chunks: list[DocumentChunk]) -> BM25Okapi:
     if not chunks:
         raise ValueError("Không có chunks để tạo BM25 index.")
 
-    tokenized = [
-        chunk.content.lower().split()
-        for chunk in chunks
-    ]
+    tokenized = [chunk.content.lower().split() for chunk in chunks]
 
     return BM25Okapi(tokenized)
 
@@ -55,9 +48,7 @@ def hybrid_search(
         return []
 
     if len(chunks) != len(embeddings):
-        raise ValueError(
-            "Số chunks phải bằng số embeddings."
-        )
+        raise ValueError("Số chunks phải bằng số embeddings.")
 
     if top_k <= 0:
         return []
@@ -69,18 +60,13 @@ def hybrid_search(
         raise ValueError("Tổng trọng số phải lớn hơn 0.")
 
     # 1. Tính điểm BM25.
-    bm25_scores = list(
-        bm25_index.get_scores(query.lower().split())
-    )
+    bm25_scores = list(bm25_index.get_scores(query.lower().split()))
 
     # 2. Tạo embedding cho câu hỏi.
     query_vector = embed_key(query)
 
     # 3. Tính cosine similarity giữa câu hỏi và từng chunk.
-    vector_scores = [
-        cosine_similiarity(query_vector, vector)
-        for vector in embeddings
-    ]
+    vector_scores = [cosine_similiarity(query_vector, vector) for vector in embeddings]
 
     # 4. Chuẩn hóa cả hai nguồn điểm.
     bm25_scores = normalise_scores(bm25_scores)

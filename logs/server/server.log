@@ -32,3 +32,74 @@
 2026-10-11 10:33:08,256 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
 2026-10-11 10:33:08,260 INFO __main__: list_appeals() được gọi: student_id='SV001'
 2026-10-11 10:33:08,267 INFO __main__: list_appeals() được gọi: student_id='Huy'
+2026-10-13 09:20:36,599 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:24:14,268 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:24:14,396 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
+2026-10-13 09:24:16,383 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập', top_k=3
+2026-10-13 09:24:17,393 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-13 09:24:17,397 INFO __main__: get_document() được gọi: doc_id='XXX'
+2026-10-13 09:24:17,399 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18, 'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'pham_chat_cong_dan': 20, 'cong_tac_lop_doan_hoi': 8}, confirmed=True
+2026-10-13 09:24:17,399 ERROR __main__: calculate_conduct_score() lỗi: name 'RUBRIC' is not defined
+2026-10-13 09:24:17,402 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18}, confirmed=True
+2026-10-13 09:24:17,402 ERROR __main__: calculate_conduct_score() lỗi: name 'RUBRIC' is not defined
+2026-10-13 09:24:17,404 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-13 09:24:17,411 INFO __main__: get_appeal_by_id() được gọi: appeal_id='8003c775'
+2026-10-13 09:24:17,432 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
+2026-10-13 09:24:17,439 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-13 09:27:12,952 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:27:13,050 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
+2026-10-13 09:27:14,138 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập', top_k=3
+2026-10-13 09:27:15,279 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-13 09:27:15,284 INFO __main__: get_document() được gọi: doc_id='XXX'
+2026-10-13 09:27:15,287 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18, 'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'pham_chat_cong_dan': 20, 'cong_tac_lop_doan_hoi': 8}, confirmed=True
+2026-10-13 09:27:15,287 ERROR __main__: calculate_conduct_score() lỗi: 'str' object has no attribute 'total'
+2026-10-13 09:27:15,291 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18}, confirmed=True
+2026-10-13 09:27:15,291 ERROR __main__: calculate_conduct_score() lỗi: 'str' object has no attribute 'total'
+2026-10-13 09:27:15,293 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-13 09:27:15,298 INFO __main__: get_appeal_by_id() được gọi: appeal_id='e4745822'
+2026-10-13 09:27:15,325 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
+2026-10-13 09:27:15,330 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-13 09:31:26,783 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:31:26,926 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
+2026-10-13 09:31:28,081 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập', top_k=3
+2026-10-13 09:31:28,920 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-13 09:31:28,923 INFO __main__: get_document() được gọi: doc_id='XXX'
+2026-10-13 09:31:28,926 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18, 'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'pham_chat_cong_dan': 20, 'cong_tac_lop_doan_hoi': 8}, confirmed=True
+2026-10-13 09:31:28,928 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18}, confirmed=True
+2026-10-13 09:31:28,930 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-13 09:31:28,936 INFO __main__: get_appeal_by_id() được gọi: appeal_id='b4d4c567'
+2026-10-13 09:31:28,962 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
+2026-10-13 09:31:28,967 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-13 09:33:09,158 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:33:09,252 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
+2026-10-13 09:33:10,178 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập', top_k=3
+2026-10-13 09:33:11,130 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-13 09:33:11,133 INFO __main__: get_document() được gọi: doc_id='XXX'
+2026-10-13 09:33:11,136 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18, 'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'pham_chat_cong_dan': 20, 'cong_tac_lop_doan_hoi': 8}, confirmed=True
+2026-10-13 09:33:11,140 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18}, confirmed=True
+2026-10-13 09:33:11,142 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-13 09:33:11,148 INFO __main__: get_appeal_by_id() được gọi: appeal_id='a9183672'
+2026-10-13 09:33:11,172 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
+2026-10-13 09:33:11,174 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-13 09:43:02,556 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:43:02,669 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
+2026-10-13 09:43:04,543 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập', top_k=3
+2026-10-13 09:43:05,414 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-13 09:43:05,418 INFO __main__: get_document() được gọi: doc_id='XXX'
+2026-10-13 09:43:05,420 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18, 'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'pham_chat_cong_dan': 20, 'cong_tac_lop_doan_hoi': 8}, confirmed=True
+2026-10-13 09:43:05,423 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18}, confirmed=True
+2026-10-13 09:43:05,425 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-13 09:43:05,430 INFO __main__: get_appeal_by_id() được gọi: appeal_id='6624643b'
+2026-10-13 09:43:05,457 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
+2026-10-13 09:43:05,460 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-13 09:45:51,305 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-13 09:45:51,437 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
+2026-10-13 09:45:52,510 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập', top_k=3
+2026-10-13 09:45:53,444 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-13 09:45:53,450 INFO __main__: get_document() được gọi: doc_id='XXX'
+2026-10-13 09:45:53,454 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18, 'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'pham_chat_cong_dan': 20, 'cong_tac_lop_doan_hoi': 8}, confirmed=False
+2026-10-13 09:45:53,460 INFO __main__: calculate_conduct_score() được gọi: scores={'hoc_tap': 18}, confirmed=False
+2026-10-13 09:45:53,464 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-13 09:45:53,473 INFO __main__: get_appeal_by_id() được gọi: appeal_id='d821bdef'
+2026-10-13 09:45:53,501 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
+2026-10-13 09:45:53,507 INFO __main__: list_appeals() được gọi: student_id='SV001'
