@@ -103,3 +103,19 @@
 2026-10-13 09:45:53,473 INFO __main__: get_appeal_by_id() được gọi: appeal_id='d821bdef'
 2026-10-13 09:45:53,501 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongtontai'
 2026-10-13 09:45:53,507 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-14 08:47:29,121 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-14 08:47:40,448 INFO __main__: search_regulations() được gọi: query='Điều 6 đánh giá những tiêu chí nào', top_k=3
+2026-10-14 08:49:58,946 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-14 08:50:13,313 INFO __main__: search_regulations() được gọi: query='Điều 6 đánh giá những tiêu chí nào', top_k=3
+2026-10-14 08:50:26,146 INFO __main__: calculate_conduct_score() được gọi: scores={'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'cong_tac_lop_doan_hoi': 8, 'hoc_tap': 18, 'pham_chat_cong_dan': 20}, confirmed=False
+2026-10-14 08:51:02,428 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-14 08:51:24,492 INFO __main__: get_appeal_by_id() được gọi: appeal_id='ba4ecca2'
+2026-10-14 09:02:20,265 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-14 09:02:35,684 INFO __main__: calculate_conduct_score() được gọi: scores={'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'cong_tac_lop_doan_hoi': 8, 'hoc_tap': 18, 'pham_chat_cong_dan': 20}, confirmed=True
+2026-10-14 09:11:19,332 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-14 09:11:29,162 INFO __main__: calculate_conduct_score() được gọi: scores={'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'cong_tac_lop_doan_hoi': 8, 'hoc_tap': 18, 'pham_chat_cong_dan': 20}, confirmed=False
+2026-10-14 09:12:31,345 INFO __main__: calculate_conduct_score() được gọi: scores={'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'cong_tac_lop_doan_hoi': 8, 'hoc_tap': 18, 'pham_chat_cong_dan': 20}, confirmed=False
+2026-10-14 09:12:56,086 INFO __main__: calculate_conduct_score() được gọi: scores={'chap_hanh_noi_quy': 22, 'chinh_tri_xa_hoi': 15, 'cong_tac_lop_doan_hoi': 8, 'hoc_tap': 18, 'pham_chat_cong_dan': 20}, confirmed=True
+2026-10-14 09:13:41,088 INFO __main__: search_regulations() được gọi: query='học phí học kỳ', top_k=3
+2026-10-14 09:13:44,919 INFO __main__: search_regulations() được gọi: query='học phí học kỳ 2024', top_k=5
+2026-10-14 09:14:21,922 INFO __main__: search_regulations() được gọi: query='học phí', top_k=5

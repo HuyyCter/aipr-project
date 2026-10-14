@@ -143,11 +143,13 @@ async def run_agent(
 
             print(f"step {step}: {name}({args}) -> {result}")
 
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tc.id,
-                "content": result,
-            })
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result,
+                }
+            )
 
     overstep_msg = "Đã vượt quá số bước xử lý cho phép."
     log_step(
