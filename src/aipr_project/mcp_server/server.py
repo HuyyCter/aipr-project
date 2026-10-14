@@ -179,8 +179,9 @@ def calculate_conduct_score(
         category_scores: Từ điển mục điểm -> điểm của mục đó (số nguyên). Phải đủ
             5 khóa: "hoc_tap", "chap_hanh_noi_quy", "chinh_tri_xa_hoi",
             "pham_chat_cong_dan", "cong_tac_lop_doan_hoi".
-        confirmed: False nếu sinh viên chưa xác nhận điểm rèn luyện trên hệ thống
-            (bị trừ 10 điểm), mặc định False.
+        confirmed: True nếu sinh viên NÊU RÕ đã xác nhận điểm rèn luyện trên hệ thống.
+            Mặc định False (chưa xác nhận, bị trừ 10 điểm). Nếu sinh viên không nói,
+            giữ False và trong câu trả lời nêu rõ kết quả đã bị trừ 10 điểm vì chưa xác nhận.
 
     Returns:
         Tổng điểm, xếp loại và điểm từng mục. Lỗi thì trả chuỗi bắt đầu bằng "Error: ".
