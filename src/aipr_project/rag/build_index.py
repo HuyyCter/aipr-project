@@ -1,16 +1,18 @@
+
 import json
 from pathlib import Path
 
-from aipr_project.rag.models import Document
+from aipr_project.rag.chunking import parse_document
 from aipr_project.rag.store import DocumentStore
-from aipr_project.rag.embeddings import batch_embed_key
 
 
-# Thư mục gốc của project
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 
 DOCS_DIR = PROJECT_ROOT / "data" / "source_docs"
 INDEX_DIR = PROJECT_ROOT / "data" / "index"
+INDEX_PATH = INDEX_DIR / "index.json"
+
+CACHE_PATH = PROJECT_ROOT / "data" / "store_cache.json"
 
 SOURCE_FILES = [
     "quy_dinh_diem_ren_luyen.md",
@@ -18,67 +20,22 @@ SOURCE_FILES = [
 ]
 
 
-def read_document(path: Path) -> Document:
-    """Đọc Markdown và lấy metadata từ YAML frontmatter."""
+def main() -> None:
+    store = DocumentStore(cache_path=CACHE_PATH)
 
-    text = path.read_text(encoding="utf-8")
-
-    if not text.startswith("---"):
-        raise ValueError(f"Thiếu YAML frontmatter: {path.name}")
-
-    parts = text.split("---", 2)
-
-    if len(parts) != 3:
-        raise ValueError(f"Frontmatter không hợp lệ: {path.name}")
-
-    metadata_text = parts[1]
-    content = parts[2].strip()
-
-    # Đọc các trường metadata đơn giản trong YAML
-    metadata = {}
-
-    for line in metadata_text.splitlines():
-        if ":" not in line:
-            continue
-
-        key, value = line.split(":", 1)
-        metadata[key.strip()] = value.strip().strip('"').strip("'")
-
-    required_fields = ["doc_id", "title", "version"]
-
-    for field in required_fields:
-        if not metadata.get(field):
-            raise ValueError(
-                f"Thiếu trường {field} trong {path.name}"
-            )
-
-    return Document(
-        doc_id=metadata["doc_id"],
-        title=metadata["title"],
-        version=metadata["version"],
-        date=metadata.get("date", ""),
-        owner=metadata.get("owner", ""),
-        content=content,
-        metadata=metadata,
-    )
-
-
-def main():
-    store = DocumentStore()
-
-    # 1. Đọc tài liệu và chia chunks
+    # 1. Read and chunk source documents.
     for filename in SOURCE_FILES:
         path = DOCS_DIR / filename
 
         if not path.exists():
-            raise FileNotFoundError(f"Không tìm thấy: {path}")
+            raise FileNotFoundError(f"Khong tim thay: {path}")
 
-        doc = read_document(path)
+        doc = parse_document(path.read_text(encoding="utf-8"))
         store.add(doc)
 
-        print(f"Đã đọc: {doc.doc_id} - {doc.title}")
+        print(f"Da doc: {doc.doc_id} - {doc.title}")
 
-    # 2. Lấy tất cả chunks
+    # 2. Collect chunks from the current documents.
     chunks = [
         chunk
         for doc in store.list_all()
@@ -86,48 +43,40 @@ def main():
     ]
 
     if not chunks:
-        raise ValueError("Không có chunks để tạo index.")
+        raise ValueError("Khong co chunks de tao index.")
 
-    print(f"\nSố tài liệu: {store.count()['documents']}")
-    print(f"Số chunks: {len(chunks)}")
+    print(f"\nSo tai lieu: {store.count()['documents']}")
+    print(f"So chunks: {len(chunks)}")
 
-    # 3. Tạo embeddings theo batch
-    embeddings = batch_embed_key(
-        [chunk.content for chunk in chunks]
-    )
+    # 3. Generate only missing embeddings.
+    store._ensure_embeddings()
 
-    if len(embeddings) != len(chunks):
-        raise ValueError("Số embeddings không khớp số chunks.")
-
-    # 4. Lưu chunks và embeddings
-    INDEX_DIR.mkdir(parents=True, exist_ok=True)
-
+    # 4. Save the legacy index format for existing consumers.
     index_data = {
         "chunks": [
             {
                 "chunk_id": chunk.chunk_id,
                 "doc_id": chunk.doc_id,
-                "title": chunk.title,
-                "version": chunk.version,
-                "date": chunk.date,
-                "owner": chunk.owner,
+                "title": chunk.metadata.get("title", ""),
+                "version": chunk.metadata.get("version", ""),
+                "date": chunk.metadata.get("date", ""),
+                "owner": chunk.metadata.get("owner", ""),
                 "content": chunk.content,
                 "metadata": chunk.metadata,
             }
             for chunk in chunks
         ],
-        "embeddings": embeddings,
+        "embeddings": [chunk.embedding for chunk in chunks],
     }
 
-    output_path = INDEX_DIR / "index.json"
-
-    output_path.write_text(
+    INDEX_DIR.mkdir(parents=True, exist_ok=True)
+    INDEX_PATH.write_text(
         json.dumps(index_data, ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 
-    print(f"\nĐã lưu index tại: {output_path}")
-    print("Build index thành công!")
+    print(f"\nDa luu index tai: {INDEX_PATH}")
+    print("Build index thanh cong!")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,30 @@
+[
+  {
+    "chunk_id": "TEST001_0",
+    "doc_id": "TEST001",
+    "content": "Điều 1. Quy định sinh viên.",
+    "chunk_index": 0,
+    "embedding": null,
+    "metadata": {
+      "doc_id": "TEST001",
+      "title": "Test",
+      "version": "2",
+      "date": "",
+      "owner": ""
+    }
+  },
+  {
+    "chunk_id": "TEST002_0",
+    "doc_id": "TEST002",
+    "content": "Điều 1. Quy định sinh viên.",
+    "chunk_index": 0,
+    "embedding": null,
+    "metadata": {
+      "doc_id": "TEST002",
+      "title": "Test",
+      "version": "2",
+      "date": "",
+      "owner": ""
+    }
+  }
+]

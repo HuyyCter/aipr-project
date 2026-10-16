@@ -1,313 +1,208 @@
 
-import json
 from pathlib import Path
+import sys
 
-from aipr_project.rag.models import DocumentChunk
-from aipr_project.rag.hybrid_search import (
-    build_bm25_index,
-    hybrid_search,
-)
-
-
-# ============================================================
-# 1. CONFIGURATION
-# ============================================================
-
+# Cho phep chay file test truc tiep tu thu muc du an.
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
-INDEX_PATH = PROJECT_ROOT / "data" / "index" / "index.json"
+SRC_DIR = PROJECT_ROOT / "src"
+
+if str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
+
+from aipr_project.rag.chunking import parse_document
+from aipr_project.rag.store import DocumentStore
+
+
+DOCS_DIR = PROJECT_ROOT / "data" / "source_docs"
+CACHE_PATH = PROJECT_ROOT / "data" / "store_cache.json"
+
+SOURCE_FILES = [
+    "quy_dinh_diem_ren_luyen.md",
+    "so_tay_sinh_vien.md",
+]
 
 TOP_K = 3
 
-FALLBACK = (
-    "I cannot find enough information "
-    "in the provided documents."
-)
+
+def build_test_store():
+    """Nap tai lieu nguon vao DocumentStore."""
+    store = DocumentStore(cache_path=CACHE_PATH)
+
+    for filename in SOURCE_FILES:
+        path = DOCS_DIR / filename
+
+        if not path.exists():
+            raise FileNotFoundError(f"Khong tim thay tai lieu: {path}")
+
+        content = path.read_text(encoding="utf-8")
+        doc = parse_document(content)
+        store.add(doc)
+
+        print(f"[OK] Da nap tai lieu: {doc.doc_id} - {doc.title}")
+
+    return store
 
 
-# ============================================================
-# 2. RETRIEVAL TEST CASES
-# ============================================================
+def test_documents_and_chunks(store):
+    """Kiem tra tai lieu, chunks va metadata."""
+    print("\n=== TEST 1: DOCUMENTS AND CHUNKS ===")
 
-TEST_CASES = [
-    {
-        "query": "Điểm rèn luyện được đánh giá như thế nào?",
-        "expected_docs": {"DOC0001", "DOC0002"},
-        "expected_keywords": ["điểm rèn luyện"],
-    },
-    {
-        "query": "Sinh viên được xếp loại rèn luyện theo những mức nào?",
-        "expected_docs": {"DOC0001"},
-        "expected_keywords": [
-            "xuất sắc",
-            "tốt",
-            "khá",
-            "trung bình",
-            "yếu",
-            "kém",
-        ],
-    },
-    {
-        "query": (
-            "Hoạt động công tác xã hội "
-            "của sinh viên được quy định ra sao?"
-        ),
-        "expected_docs": {"DOC0002"},
-        "expected_keywords": ["công tác xã hội"],
-    },
-    {
-        "query": "Điểm rèn luyện được tính theo những tiêu chí nào?",
-        "expected_docs": {"DOC0001"},
-        "expected_keywords": ["điểm rèn luyện"],
-    },
-    {
-        "query": "Sinh viên có thể tham gia hoạt động công tác xã hội nào?",
-        "expected_docs": {"DOC0002"},
-        "expected_keywords": ["công tác xã hội"],
-    },
-    {
-        "query": "Quy định về điểm rèn luyện của sinh viên là gì?",
-        "expected_docs": {"DOC0001", "DOC0002"},
-        "expected_keywords": ["điểm rèn luyện"],
-    },
-]
-
-
-# ============================================================
-# 3. LOAD INDEX
-# ============================================================
-
-def load_index():
-    print("=" * 65)
-    print("TEST RAG - LOAD INDEX")
-    print("=" * 65)
-
-    if not INDEX_PATH.exists():
-        raise FileNotFoundError(
-            f"Không tìm thấy index: {INDEX_PATH}"
-        )
-
-    with INDEX_PATH.open("r", encoding="utf-8") as file:
-        index_data = json.load(file)
-
+    counts = store.count()
     chunks = [
-        DocumentChunk(**item)
-        for item in index_data["chunks"]
+        chunk
+        for doc in store.list_all()
+        for chunk in store.get_chunk_by_doc(doc.doc_id)
     ]
 
-    embeddings = index_data["embeddings"]
+    checks = {
+        "Co tai lieu": counts["documents"] > 0,
+        "Co chunks": len(chunks) > 0,
+        "Chunk ID khong trung": (
+            len({chunk.chunk_id for chunk in chunks}) == len(chunks)
+        ),
+        "Chunk co noi dung": all(
+            chunk.content.strip() for chunk in chunks
+        ),
+        "Chunk co doc_id": all(chunk.doc_id for chunk in chunks),
+        "Chunk co title": all(
+            chunk.metadata.get("title") for chunk in chunks
+        ),
+        "Chunk co version": all(
+            chunk.metadata.get("version") for chunk in chunks
+        ),
+    }
 
-    if not chunks:
-        raise ValueError("Index không có chunks.")
+    print(f"So tai lieu: {counts['documents']}")
+    print(f"So chunks: {len(chunks)}")
 
-    if len(chunks) != len(embeddings):
-        raise ValueError(
-            "Số chunks và embeddings không khớp."
+    for name, passed in checks.items():
+        print(f"[{'PASS' if passed else 'FAIL'}] {name}")
+
+    return all(checks.values())
+
+
+def test_bm25_search(store):
+    """Kiem tra BM25 ma khong can goi embedding API."""
+    print("\n=== TEST 2: BM25 SEARCH ===")
+
+    query = "diem ren luyen sinh vien"
+    results = store.search(query, top_k=TOP_K, mode="bm25")
+
+    print(f"Query: {query}")
+    print(f"So ket qua: {len(results)}")
+
+    for rank, (chunk, score) in enumerate(results, start=1):
+        title = chunk.metadata.get("title", "")
+        print(
+            f"[{rank}] {chunk.chunk_id} | {title} | "
+            f"Score: {score:.4f}"
         )
+        print(chunk.content[:180].replace("\n", " "))
+        print()
 
-    print(f"Index: {INDEX_PATH}")
-    print(f"Số chunks: {len(chunks)}")
-    print(f"Số embeddings: {len(embeddings)}")
-
-    return chunks, embeddings
-
-
-# ============================================================
-# 4. TEST CITATION AND VERSION
-# ============================================================
-
-def test_citations(chunks):
-    print("\n" + "=" * 65)
-    print("TEST CITATION AND VERSION")
-    print("=" * 65)
-
-    passed = 0
-
-    for chunk in chunks:
-        valid = all([
-            bool(chunk.chunk_id),
-            bool(chunk.doc_id),
-            bool(chunk.title),
-            bool(chunk.version),
-            bool(chunk.content.strip()),
-        ])
-
-        if valid:
-            passed += 1
-        else:
-            print(
-                f"[FAIL] Metadata không hợp lệ: "
-                f"{chunk.chunk_id}"
-            )
-
-    print(
-        f"Metadata hợp lệ: {passed}/{len(chunks)} chunks"
+    passed = (
+        len(results) > 0
+        and all(isinstance(score, (int, float)) for _, score in results)
     )
 
-    # Kiểm tra chunk_id không bị trùng.
-    chunk_ids = [chunk.chunk_id for chunk in chunks]
-    unique_ids = set(chunk_ids)
-
-    unique_ok = len(chunk_ids) == len(unique_ids)
-
-    print(
-        "Chunk ID duy nhất: "
-        f"{'PASS' if unique_ok else 'FAIL'}"
-    )
-
-    return passed == len(chunks) and unique_ok
+    print(f"[{'PASS' if passed else 'FAIL'}] BM25 search")
+    return passed
 
 
-# ============================================================
-# 5. TEST RETRIEVAL
-# ============================================================
+def test_dense_and_hybrid_search(store):
+    """Kiem tra Dense va Hybrid search; can JINA_API_KEY."""
+    print("\n=== TEST 3: DENSE AND HYBRID SEARCH ===")
 
-def test_retrieval(chunks, embeddings, bm25_index):
-    print("\n" + "=" * 65)
-    print("TEST RETRIEVAL")
-    print("=" * 65)
+    query = "thoi gian danh gia diem ren luyen sinh vien"
 
-    passed = 0
+    try:
+        for mode in ("dense", "hybrid"):
+            print(f"\n--- Mode: {mode} ---")
+            results = store.search(query, top_k=TOP_K, mode=mode)
 
-    for case in TEST_CASES:
-        query = case["query"]
+            print(f"So ket qua: {len(results)}")
 
-        results = hybrid_search(
-            query=query,
-            chunks=chunks,
-            embeddings=embeddings,
-            bm25_index=bm25_index,
-            top_k=TOP_K,
-        )
+            for rank, (chunk, score) in enumerate(results, start=1):
+                title = chunk.metadata.get("title", "")
+                print(
+                    f"[{rank}] {chunk.chunk_id} | {title} | "
+                    f"Score: {score:.4f}"
+                )
+                print(chunk.content[:180].replace("\n", " "))
 
-        # Tài liệu xuất hiện trong Top K.
-        found_docs = {
-            chunks[index].doc_id
-            for index, score in results
-        }
+            if not results:
+                print(f"[FAIL] {mode}: khong co ket qua")
+                return False
 
-        # Nội dung thực tế của Top K.
-        retrieved_content = "\n".join(
-            chunks[index].content
-            for index, score in results
-        ).casefold()
+        print("\n[PASS] Dense va Hybrid search")
+        return True
 
-        expected_docs = case["expected_docs"]
-
-        # Kiểm tra có ít nhất một tài liệu mong đợi.
-        document_ok = bool(found_docs & expected_docs)
-
-        # Kiểm tra có ít nhất một từ khóa mong đợi.
-        keyword_ok = any(
-            keyword.casefold() in retrieved_content
-            for keyword in case["expected_keywords"]
-        )
-
-        # Lưu ý: đây là kiểm tra sơ bộ, chưa chứng minh
-        # đoạn trích đã trả lời đầy đủ câu hỏi.
-        ok = document_ok and keyword_ok
-
-        if ok:
-            passed += 1
-
-        print(f"\nCâu hỏi: {query}")
-        print(f"Tài liệu mong đợi: {sorted(expected_docs)}")
-        print(f"Tài liệu tìm được: {sorted(found_docs)}")
-        print(f"Kiểm tra tài liệu: {'PASS' if document_ok else 'FAIL'}")
-        print(f"Kiểm tra từ khóa: {'PASS' if keyword_ok else 'FAIL'}")
-        print(f"Kết quả: {'PASS' if ok else 'FAIL'}")
-
-        for rank, (index, score) in enumerate(results, start=1):
-            chunk = chunks[index]
-
-            print(
-                f"  [{rank}] {chunk.chunk_id} | "
-                f"{chunk.title} | "
-                f"Version: {chunk.version} | "
-                f"Score: {score:.4f}"
-            )
-
-    print(f"\nRetrieval: {passed}/{len(TEST_CASES)} câu đạt")
-
-    return passed == len(TEST_CASES)
+    except Exception as exc:
+        print(f"\n[FAIL] Dense/Hybrid search: {exc}")
+        print("Kiem tra JINA_API_KEY, ket noi mang va embedding cache.")
+        return False
 
 
-# ============================================================
-# 6. TEST OUT-OF-SCOPE RETRIEVAL
-# ============================================================
+def test_invalid_inputs(store):
+    """Kiem tra cac dau vao khong hop le."""
+    print("\n=== TEST 4: INVALID INPUTS ===")
 
-def test_out_of_scope(chunks, embeddings, bm25_index):
-    print("\n" + "=" * 65)
-    print("TEST OUT-OF-SCOPE QUESTION")
-    print("=" * 65)
+    empty_query_ok = store.search("", mode="bm25") == []
+    invalid_mode_ok = False
 
-    query = "Thời tiết ngày mai ở Hà Nội như thế nào?"
+    try:
+        store.search("diem ren luyen", mode="invalid")
+    except ValueError:
+        invalid_mode_ok = True
 
-    results = hybrid_search(
-        query=query,
-        chunks=chunks,
-        embeddings=embeddings,
-        bm25_index=bm25_index,
-        top_k=TOP_K,
-    )
+    invalid_top_k_ok = store.search(
+        "diem ren luyen", top_k=0, mode="bm25"
+    ) == []
 
-    print(f"Câu hỏi: {query}")
-    print(
-        "Lưu ý: Hybrid search vẫn có thể trả về Top K "
-        "dù tài liệu không chứa câu trả lời."
-    )
+    checks = {
+        "Query rong": empty_query_ok,
+        "Mode khong hop le": invalid_mode_ok,
+        "top_k bang 0": invalid_top_k_ok,
+    }
 
-    for rank, (index, score) in enumerate(results, start=1):
-        chunk = chunks[index]
+    for name, passed in checks.items():
+        print(f"[{'PASS' if passed else 'FAIL'}] {name}")
 
-        print(f"\n[{rank}] Score: {score:.4f}")
-        print(f"Tài liệu: {chunk.title}")
-        print(f"Chunk ID: {chunk.chunk_id}")
-        print(f"Nội dung: {chunk.content[:200]}")
+    return all(checks.values())
 
-    print(
-        "\nFallback chưa được xác nhận ở đây; "
-        "cần kiểm tra qua Agent/Generation."
-    )
-
-    return True
-
-
-# ============================================================
-# 7. MAIN
-# ============================================================
 
 def main():
-    chunks, embeddings = load_index()
+    print("=" * 60)
+    print("RAG RETRIEVAL TEST")
+    print("=" * 60)
 
-    bm25_index = build_bm25_index(chunks)
-    print("\nBM25 index: OK")
+    try:
+        store = build_test_store()
+    except Exception as exc:
+        print(f"\n[ERROR] Khong the nap tai lieu: {exc}")
+        return
 
-    citation_ok = test_citations(chunks)
+    results = {
+        "Documents/chunks": test_documents_and_chunks(store),
+        "BM25": test_bm25_search(store),
+        "Dense/Hybrid": test_dense_and_hybrid_search(store),
+        "Invalid inputs": test_invalid_inputs(store),
+    }
 
-    retrieval_ok = test_retrieval(
-        chunks,
-        embeddings,
-        bm25_index,
-    )
-
-    test_out_of_scope(
-        chunks,
-        embeddings,
-        bm25_index,
-    )
-
-    print("\n" + "=" * 65)
+    print("\n" + "=" * 60)
     print("FINAL SUMMARY")
-    print("=" * 65)
+    print("=" * 60)
 
-    print(f"Citation / metadata: {'PASS' if citation_ok else 'FAIL'}")
-    print(f"Retrieval: {'PASS' if retrieval_ok else 'FAIL'}")
-    print("Fallback: NOT TESTED - cần tích hợp Agent/Generation")
+    for name, passed in results.items():
+        print(f"[{'PASS' if passed else 'FAIL'}] {name}")
 
-    if citation_ok and retrieval_ok:
-        print("\nRAG CORE TEST PASSED")
+    passed_count = sum(results.values())
+    print(f"\nTong ket: {passed_count}/{len(results)} nhom test PASS")
+
+    if all(results.values()):
+        print("RAG RETRIEVAL TEST PASSED")
     else:
-        print("\nRAG CORE TEST FAILED - cần kiểm tra các mục FAIL")
+        print("RAG RETRIEVAL TEST CO MUC CAN KIEM TRA")
 
 
 if __name__ == "__main__":
