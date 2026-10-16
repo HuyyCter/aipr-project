@@ -1,0 +1,26 @@
+[
+  {
+    "user_input":"Mục ý thức chấp hành nội quy, quy chế tối đa bao nhiêu điểm?",
+    "retrieved_contexts":[
+      "Điều 6. Đánh giá về ý thức và kết quả chấp hành nội quy, quy chế, quy định trong trường\n2. Khung điểm đánh giá từ 0 điểm đến 25 điểm."
+    ],
+    "response":"Mục này có khung điểm từ 0 đến 25 điểm, tức tối đa 25 điểm (Điều 6, DOC0001).",
+    "reference":"Tối đa 25 điểm (Điều 6, DOC0001).",
+    "faithfulness":0.6666666667,
+    "answer_relevancy":0.607948423,
+    "context_precision":0.9999999999,
+    "context_recall":1.0
+  },
+  {
+    "user_input":"Điểm rèn luyện từ 80 đến dưới 90 điểm thì xếp loại gì?",
+    "retrieved_contexts":[
+      "Điều 10. Phân loại kết quả rèn luyện\na) Từ 90 điểm đến 100 điểm: loại xuất sắc;\nb) Từ 80 điểm đến dưới 90 điểm: loại tốt;\nc) Từ 65 điểm đến dưới 80 điểm: loại khá;"
+    ],
+    "response":"Điểm từ 80 đến dưới 90 là loại tốt.",
+    "reference":"Loại tốt (Điều 10, DOC0001).",
+    "faithfulness":1.0,
+    "answer_relevancy":0.6942281012,
+    "context_precision":0.9999999999,
+    "context_recall":1.0
+  }
+]

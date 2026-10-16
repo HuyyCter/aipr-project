@@ -119,7 +119,7 @@ def search_regulations(query: str, top_k: int = 3) -> str:
         if not query.strip():
             return "Error: query không được rỗng."
 
-        top_k = max(1, min(top_k, 8))
+        top_k = max(1, min(top_k, 3))
         result = hybrid_search(query, CHUNKS, EMBEDDINGS, BM25, top_k=top_k)
         if not result:
             return NOT_FOUND_MESSAGE
