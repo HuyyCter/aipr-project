@@ -35,10 +35,11 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 - [x] Lên kế hoạch lộ trình tiến độ, phân kỳ mốc merge code (`context/roadmap-sv2.md`)
 - [ ] `agent/loop.py`
 - [ ] `agent/logger.py`
-- [ ] `eval/evaluate.py`
+- [x] `eval/evaluate.py`
 - [x] `common/llm_client.py`
-- [ ] `tests/testset.jsonl`
+- [x] `tests/testset.jsonl`
 - [ ] `prompts/system_agent.txt`
+- [x] `prompts/judge.txt`
 
 **Prompt chính đã dùng:**
 ```text
@@ -47,13 +48,27 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 3. cap nhat them phan nao lien quan den file tai lieu mau nao trong roadmap-sv2
 4. toi muon hoi ham embed() trong llm_client, input la mot list toi co nen tach them embed_text va batch_embed_text nhu w3 hay khong. Toi du tinh su dung jina_embedding nhu w3 hay viet lai, trong context co quy dinh ve them file vao khong va co nen lam the khong
 5. Giup toi viet ham chat() trong llm_client nhung toi khong muon xai qua nhieu model va viet them 1 ham main/chuong trinh de test. Ghi phan nay vao ai-usage
+6. evaluate.py co xay dung theo mo hinh RAGAS khong. Neu khong thi can nhung do luong nhung gi: Faithfulness, answer relevance, context precision,...
+7. Tao cho toi khung suon cho evaluate.py va viet prompt cho judge.txt
+8. Kiem tra va sua loi KeyError '\n  "claims"' khi format prompt trong evaluate.py (chuyen sang dung chuoi .replace() an toan)
+9. Kiem tra file llm_client xem co phan nao du thua/bat hop ly, xoa ham log_api_call, xoa khoi test __main__ va fix logic ngat HTTP 401/403 cua Jina
+10. Kiem tra lich su ai tao 10 cau trong testset, vi sao co DOC0003 va DOC0004 trong khi project moi co 2 file
+11. Chuan hoa bo 20 cau hoi testset.jsonl (chia 5 type ro rang, bo sung q15 thieu du lieu va chu thich nhom)
 ```
 
 **Đoạn code nào do AI sinh (vs tự viết):** 
 - AI hỗ trợ phân tích yêu cầu từ các file context, lập kế hoạch chi tiết 4 giai đoạn thực hiện, các mốc merge code, và xây dựng bảng ánh xạ trực tiếp từng đầu việc SV2 với các file tài liệu mẫu trong `context/roadmap-sv2.md`.
 - Trong `src/aipr_project/common/llm_client.py`:
   + Tự viết: Kế thừa hàm `_jina_embeddings` và cấu trúc `embed()` từ lab Week 3, tích hợp vào `LLMClient`.
-  + AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b` (kế thừa từ W2/W6), xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP (ngắt khi 401/403/404, retry khi 429/5xx), ghi log lỗi ra `sys.stderr` theo Yêu cầu 2.4, và viết khối `if __name__ == "__main__":` kiểm thử end-to-end cả chat thường, chat tool-calling và embedding.
+  + AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b`, xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP (ngắt khi 401/403/404, retry khi 429/5xx). Sau đó AI hỗ trợ refactor dọn dẹp code thừa: xóa `log_api_call`, xóa khối test `__main__` và chỉnh sửa bắt lỗi 401/403 của Jina để ngắt ngay lập tức không retry.
+- Trong `prompts/judge.txt`:
+  + AI sinh toàn bộ nội dung prompt cho mô hình LLM-as-a-judge (tách câu trả lời thành atomic claims, đối chiếu ngữ cảnh truy hồi, xuất định dạng JSON chấm điểm Faithfulness).
+- Trong `src/aipr_project/eval/evaluate.py`:
+  + AI sinh toàn bộ khung sườn và hoàn thiện code chạy đánh giá hệ thống Agentic RAG qua testset thật (kết nối MCP Server thật qua stdio, trích xuất retrieved context và token usage từ trace logs, gọi LLM judge chấm Faithfulness, đo Refusal Rate cho câu `no_answer`, đo Retrieval Hit Rate, xuất báo cáo CSV và in Rich Table).
+- Trong `tests/testset.jsonl`:
+  + Tự viết: Đóng góp và mở rộng các câu hỏi tình huống tiếng Việt và tiếng Anh.
+  + AI hỗ trợ: Chuẩn hóa 20 câu hỏi theo 5 types (`direct`, `synthesis`, `calc`, `action`, `no_answer`), bổ sung câu `q15` (thiếu dữ liệu đầu vào), chèn các dòng comment phân nhóm và hỗ trợ `evaluate.py` đọc bỏ qua dòng comment.
+  + *Ghi chú quan trọng về dữ liệu:* Hiện tại kho dữ liệu `data/source_docs/` mới chỉ có `DOC0001` (Quy chế 2021) và `DOC0002` (Sổ tay 2024); các mã `DOC0003` và `DOC0004` trong testset là tài liệu giả định theo thiết kế ban đầu của nhóm (chưa có file thực tế trong index), SV2 sẽ thảo luận thêm với SV1 để thống nhất bổ sung tài liệu hoặc điều chỉnh lại testset.
 
 ---
 

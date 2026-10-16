@@ -194,7 +194,11 @@ async def run_eval(
         raise FileNotFoundError(f"Không tìm thấy testset: {testset_path}")
 
     with open(testset_path, "r", encoding="utf-8") as f:
-        test_items = [json.loads(line) for line in f if line.strip()]
+        test_items = [
+            json.loads(line)
+            for line in f
+            if line.strip() and not line.strip().startswith(("#", "//"))
+        ]
 
     if limit:
         test_items = test_items[:limit]

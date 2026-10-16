@@ -1,10 +1,44 @@
+# ==============================================================================
+# NHÓM 1: DIRECT (Tra cứu trực tiếp - Tầng a)
+# Mục đích: Câu trả lời nằm trọn vẹn trong 1 đoạn trích, có trích dẫn doc_id rõ ràng.
+# ==============================================================================
 {"id": "q01", "question": "Mục ý thức chấp hành nội quy, quy chế tối đa bao nhiêu điểm?", "type": "direct", "expected_doc_ids": ["DOC0001"]}
 {"id": "q02", "question": "Hạn nộp khiếu nại kết quả đánh giá rèn luyện là bao lâu kể từ ngày công bố kết quả?", "type": "direct", "expected_doc_ids": ["DOC0003"]}
-{"id": "q03", "question": "Nếu sinh viên có minh chứng tham gia hoạt động chính trị-xã hội ở cả học kỳ này và quy định đã thay đổi so với năm trước, thì tính theo quy chế nào?", "type": "synthesis", "expected_doc_ids": ["DOC0001", "DOC0002"]}
-{"id": "q04", "question": "Với minh chứng hiện có của sinh viên SV001 trong học kỳ này, điểm rèn luyện là bao nhiêu và xếp loại gì?", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0004"]}
-{"id": "q05", "question": "Tính điểm rèn luyện của sinh viên SV002, biết minh chứng mục hoạt động chính trị-xã hội chưa được nộp.", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0004"]}
-{"id": "q06", "question": "Tôi muốn khiếu nại điểm mục hoạt động chính trị-xã hội, lý do: còn thiếu 1 minh chứng chưa được tính vào điểm.", "type": "action", "expected_doc_ids": ["DOC0003"]}
-{"id": "q07", "question": "Học bổng khuyến khích học tập xét theo những tiêu chí nào?", "type": "no_answer", "expected_doc_ids": []}
-{"id": "q08", "question": "Mức học phí học kỳ này của sinh viên hệ chính quy là bao nhiêu?", "type": "no_answer", "expected_doc_ids": []}
-{"id": "q09", "question": "Quy định về thời gian tốt nghiệp sớm là gì?", "type": "no_answer", "expected_doc_ids": []}
-{"id": "q10", "question": "Thủ tục xin nghỉ học tạm thời cần những giấy tờ gì?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q03", "question": "Cách tính điểm rèn luyện trong một học kỳ", "type": "direct", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+{"id": "q04", "question": "Nếu tôi quên xác nhận điểm rèn luyện trong trang online thì bị trừ bao nhiêu điểm rèn luyện?", "type": "direct", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+{"id": "q05", "question": "If i get GPA 3.6 in semester 1 in 2021, how much point i will have?", "type": "direct", "expected_doc_ids": ["DOC0001"]}
+
+# ==============================================================================
+# NHÓM 2: SYNTHESIS (Tổng hợp & So sánh phiên bản - Tầng a + b)
+# Mục đích: Ghép nối >= 2 tài liệu, hoặc so sánh mâu thuẫn giữa 2 phiên bản 2021 và 2024.
+# ==============================================================================
+{"id": "q06", "question": "Nếu sinh viên có minh chứng tham gia hoạt động chính trị-xã hội ở cả học kỳ này và quy định đã thay đổi so với năm trước, thì tính theo quy chế nào?", "type": "synthesis", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+{"id": "q07", "question": "Khung phân loại điểm rèn luyện cho sinh viên năm 2021 và năm 2024", "type": "synthesis", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+{"id": "q08", "question": "I studied in 2021 and earned 90 points in the first semester of my first year. I then left for military service, returned to my studies in 2024, and completed the second semester of my first year with 79 training points. Given this, what is my overall classification for that academic year?", "type": "synthesis", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+
+# ==============================================================================
+# NHÓM 3: CALC (Tính toán điểm rèn luyện - Tầng b)
+# Mục đích: Gọi tool calculate_conduct_score, có ca cố ý thiếu dữ liệu để kiểm tra từ chối tính.
+# ==============================================================================
+{"id": "q09", "question": "Với minh chứng hiện có của sinh viên SV001 trong học kỳ này, điểm rèn luyện là bao nhiêu và xếp loại gì?", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0004"]}
+{"id": "q10", "question": "Tính điểm rèn luyện của sinh viên SV002, biết minh chứng mục hoạt động chính trị-xã hội chưa được nộp.", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0004"]}
+{"id": "q11", "question": "Tính điểm rèn luyện của sinh viên SV003 nhập học năm 2024 và đạt thành tích trung bình nhưng đóng trễ học phí", "type": "calc", "expected_doc_ids": ["DOC0001", "DOC0002"]}
+{"id": "q12", "question": "SV004 student that studying 6 subjects and getting a 3.0 GPA in overall for 4 subjects, but barred from taking an exam for 2 subjects. How point SV004 will have?", "type": "calc", "expected_doc_ids": ["DOC0001"]}
+
+# ==============================================================================
+# NHÓM 4: ACTION (Hành động có Side-effect & Bắt buộc Verify - Tầng c)
+# Mục đích: Thực thi submit_appeal, bắt buộc có get_appeal_by_id để verify; ca q15 thiếu dữ liệu đầu vào.
+# ==============================================================================
+{"id": "q13", "question": "Tôi muốn khiếu nại điểm mục hoạt động chính trị-xã hội, lý do: còn thiếu 1 minh chứng chưa được tính vào điểm.", "type": "action", "expected_doc_ids": ["DOC0003"]}
+{"id": "q14", "question": "Tôi muốn nộp đơn khiếu nại do công tác xác nhận minh chứng điểm rèn luyện không thỏa đáng, nhiều sinh viên không tham gia lớp học lại có điểm rèn luyện cao", "type": "action", "expected_doc_ids": ["DOC0003"]}
+{"id": "q15", "question": "Tôi muốn nộp đơn khiếu nại điểm rèn luyện học kỳ này vì thấy kết quả bị sai lệch, nhờ hệ thống nộp đơn khiếu nại giúp tôi.", "type": "action", "expected_doc_ids": ["DOC0001", "DOC0003"]}
+
+# ==============================================================================
+# NHÓM 5: NO_ANSWER (Từ chối câu hỏi ngoài phạm vi / Thiếu tài liệu quy chế)
+# Mục đích: Kiểm tra Agent từ chối đúng chuẩn, không hallucinate, expected_doc_ids luôn là [].
+# ==============================================================================
+{"id": "q16", "question": "Học bổng khuyến khích học tập xét theo những tiêu chí nào?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q17", "question": "Mức học phí học kỳ này của sinh viên hệ chính quy là bao nhiêu?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q18", "question": "Quy định về thời gian tốt nghiệp sớm là gì?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q19", "question": "Thủ tục xin nghỉ học tạm thời cần những giấy tờ gì?", "type": "no_answer", "expected_doc_ids": []}
+{"id": "q20", "question": "I lost my glasses during an exam in room A101, how can I report it?", "type": "no_answer", "expected_doc_ids": []}
