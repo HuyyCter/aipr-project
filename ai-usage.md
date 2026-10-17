@@ -36,7 +36,7 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 **Dùng cho phần nào:**
 
 - [x] Lên kế hoạch lộ trình tiến độ, phân kỳ mốc merge code (`context/roadmap-sv2.md`)
-- [ ] `agent/loop.py`
+- [x] `agent/loop.py`
 - [ ] `agent/logger.py`
 - [x] `eval/evaluate.py`
 - [x] `common/llm_client.py`
@@ -47,18 +47,9 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 **Prompt chính đã dùng:**
 
 ```text
-1. Overview du an, toi thuc hien voi tu cach la sv2, nhung cong viec se lam va pham vi kien thuc, check trong thu muc me aipr
-2. Tao giup toi mot file local md de chia giai doan cac viec cua sv2 de theo doi tien do, khi nao nen hoan thanh file, khi nao can merge code voi thanh vien khac. Cap nhat ban da lam len ai-usage.md cua sv2
-3. cap nhat them phan nao lien quan den file tai lieu mau nao trong roadmap-sv2
-4. toi muon hoi ham embed() trong llm_client, input la mot list toi co nen tach them embed_text va batch_embed_text nhu w3 hay khong. Toi du tinh su dung jina_embedding nhu w3 hay viet lai, trong context co quy dinh ve them file vao khong va co nen lam the khong
-5. Giup toi viet ham chat() trong llm_client nhung toi khong muon xai qua nhieu model va viet them 1 ham main/chuong trinh de test. Ghi phan nay vao ai-usage
-6. evaluate.py co xay dung theo mo hinh RAGAS khong. Neu khong thi can nhung do luong nhung gi: Faithfulness, answer relevance, context precision,...
-7. Tao cho toi khung suon cho evaluate.py va viet prompt cho judge.txt
-8. Kiem tra va sua loi KeyError '\n  "claims"' khi format prompt trong evaluate.py (chuyen sang dung chuoi .replace() an toan)
-9. Kiem tra file llm_client xem co phan nao du thua/bat hop ly, xoa ham log_api_call, xoa khoi test __main__ va fix logic ngat HTTP 401/403 cua Jina
-10. Kiem tra lich su ai tao 10 cau trong testset, vi sao co DOC0003 va DOC0004 trong khi project moi co 2 file
-11. Chuan hoa bo 20 cau hoi testset.jsonl (chia 5 type ro rang, bo sung q15 thieu du lieu va chu thich nhom)
-12. Dieu chinh lai testset.expected_doc_ids: loai bo DOC0003 va DOC0004 (chi con DOC0001 va DOC0002) de khop voi kho source_docs thuc te
+1. [Thiết kế & Lộ trình] Phân tích yêu cầu đề tài T4 từ thư mục context, lập kế hoạch chi tiết các mốc tiến độ cho SV2 (LLM client, agent loop, evaluation) và ánh xạ với các bài lab W1-W7.
+2. [Đánh giá & Benchmark] Hướng dẫn xây dựng module evaluate.py và thiết kế prompts/judge.txt theo mô hình LLM-as-a-judge chấm Faithfulness, đo Correct Refusal Rate cho câu no_answer và trích xuất chi phí token từ log trace.
+3. [Tối ưu Token & Rate Limit] Phân tích lỗi Rate Limit của Groq API (TPM 8,000 vs TPD 200,000 tokens/ngày); hỗ trợ viết hàm prune_messages() trong loop.py để cắt gọn context và tối ưu cơ chế fail-fast trong llm_client.py.
 ```
 
 **Đoạn code nào do AI sinh (vs tự viết):**
@@ -66,7 +57,10 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 - AI hỗ trợ phân tích yêu cầu từ các file context, lập kế hoạch chi tiết 4 giai đoạn thực hiện, các mốc merge code, và xây dựng bảng ánh xạ trực tiếp từng đầu việc SV2 với các file tài liệu mẫu trong `context/roadmap-sv2.md`.
 - Trong `src/aipr_project/common/llm_client.py`:
   - Tự viết: Kế thừa hàm `_jina_embeddings` và cấu trúc `embed()` từ lab Week 3, tích hợp vào `LLMClient`.
-  - AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b`, xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP (ngắt khi 401/403/404, retry khi 429/5xx). Sau đó AI hỗ trợ refactor dọn dẹp code thừa: xóa `log_api_call`, xóa khối test `__main__` và chỉnh sửa bắt lỗi 401/403 của Jina để ngắt ngay lập tức không retry.
+  - AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b`, xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP. Tinh chỉnh nâng cao: phân biệt rõ lỗi Rate Limit ngày (TPD) để ngắt ngay lập tức tránh retry vô ích và chỉ chờ hồi phục đối với lỗi Rate Limit phút (TPM); dọn dẹp code thừa và hoàn thiện cơ chế bắt lỗi Jina 401/403.
+- Trong `src/aipr_project/agent/loop.py`:
+  - Tự viết: Cài đặt luồng vòng lặp ReAct, kết nối `mcp_client.connect()` / `discover()`, cơ chế ngắt trần `MAX_STEPS = 6` và parse tham số `tool_calls` an toàn.
+  - AI hỗ trợ: Bổ sung hàm `prune_messages()` tự động rút gọn các `tool_result` cũ khi chuỗi hội thoại vượt ngưỡng 10,000 ký tự nhằm chống tràn Rate Limit TPM (8,000 tokens) và lỗi HTTP 413 của Groq; bọc `try...except` quanh `client.chat()` chống sập luồng agent.
 - Trong `prompts/judge.txt`:
   - AI sinh toàn bộ nội dung prompt cho mô hình LLM-as-a-judge (tách câu trả lời thành atomic claims, đối chiếu ngữ cảnh truy hồi, xuất định dạng JSON chấm điểm Faithfulness).
 - Trong `src/aipr_project/eval/evaluate.py`:
