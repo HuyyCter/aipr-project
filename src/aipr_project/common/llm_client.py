@@ -171,6 +171,34 @@ class LLMClient:
                         file=sys.stderr,
                     )
                     raise e
+
+                # Kiểm tra lỗi Rate Limit (429 hoặc 413 do chạm hạn mức TPM theo phút)
+                msg_lower = (e.message or "").lower()
+                is_rate_limit = (
+                    e.status_code == 429
+                    or (e.status_code == 413 and "tokens per minute" in msg_lower)
+                )
+                if is_rate_limit:
+                    if attempt < max_retries:
+                        sleep_time = 12.0 * (attempt + 1)
+                        print(
+                            f"[Rate Limit Groq] Chạm hạn mức TPM phút (lần {attempt + 1}/{max_retries + 1}). "
+                            f"Đang chờ {sleep_time:.1f}s để hồi phục token bucket...",
+                            file=sys.stderr,
+                        )
+                        time.sleep(sleep_time)
+                        continue
+                    else:
+                        print(f"[Rate Limit Groq] Vượt hạn mức TPM sau {max_retries} lần retry: {e.message}", file=sys.stderr)
+                        raise e
+
+                if e.status_code == 413:
+                    print(
+                        f"[CRITICAL HTTP 413] Kích thước prompt vượt giới hạn tuyệt đối: {e.message}. Không retry.",
+                        file=sys.stderr,
+                    )
+                    raise e
+
                 print(
                     f"[HTTP {e.status_code}] Groq API lỗi tạm thời (lần thử {attempt + 1}/{max_retries + 1}): {e.message}",
                     file=sys.stderr,

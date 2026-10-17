@@ -45,6 +45,40 @@ def convert_tools(mcp_tools: list[Any]) -> list[dict]:
     ]
 
 
+def _get_msg_field(m: Any, field: str, default: Any = None) -> Any:
+    if isinstance(m, dict):
+        return m.get(field, default)
+    return getattr(m, field, default)
+
+
+def prune_messages(messages: list[Any], max_chars: int = 10000) -> None:
+    """Rút gọn nội dung các tool messages cũ nếu tổng kích thước hội thoại quá lớn
+    nhằm tránh lỗi 413 (Rate Limit TPM / Request too large) của Groq."""
+    total_len = sum(len(str(_get_msg_field(m, "content") or "")) for m in messages)
+    if total_len <= max_chars:
+        return
+
+    # Thu thập tất cả các index của message có role == "tool"
+    tool_indices = [i for i, m in enumerate(messages) if _get_msg_field(m, "role") == "tool"]
+    if not tool_indices:
+        return
+
+    # Rút gọn các tool messages cũ hơn (trừ cái cuối cùng)
+    for idx in tool_indices[:-1]:
+        if isinstance(messages[idx], dict):
+            content = messages[idx].get("content") or ""
+            if len(content) > 350:
+                messages[idx]["content"] = content[:350] + "\n...[Nội dung tra cứu trước đó đã được rút gọn để tối ưu ngữ cảnh]..."
+
+    # Nếu sau khi rút gọn các cái cũ mà vẫn vượt max_chars, rút gọn luôn cái mới nhất nếu nó quá dài
+    total_len = sum(len(str(_get_msg_field(m, "content") or "")) for m in messages)
+    if total_len > max_chars and isinstance(messages[tool_indices[-1]], dict):
+        last_idx = tool_indices[-1]
+        content = messages[last_idx].get("content") or ""
+        if len(content) > 1500:
+            messages[last_idx]["content"] = content[:1500] + "\n...[Nội dung đã được rút gọn để tối ưu ngữ cảnh]..."
+
+
 async def run_agent(
     question: str,
     session: Any,
@@ -71,7 +105,19 @@ async def run_agent(
     tools = convert_tools(mcp_tools)
 
     for step in range(1, max_steps + 1):
-        response = client.chat(messages=messages, tools=tools)
+        prune_messages(messages)
+        try:
+            response = client.chat(messages=messages, tools=tools)
+        except Exception as exc:
+            err_msg = f"Lỗi gọi mô hình ngôn ngữ ở bước {step}: {exc}"
+            log_step(
+                run_id=run_id,
+                question_id=question_id,
+                step_index=step_index,
+                step_type="error",
+                result=err_msg,
+            )
+            return err_msg
 
         usage = {
             "calls": 1,

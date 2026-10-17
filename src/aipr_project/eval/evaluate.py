@@ -107,10 +107,14 @@ def judge_faithfulness(
         # Nếu không có context nào được lấy ra nhưng vẫn trả lời khẳng định sự thực
         return 0.0
 
+    eval_context = context
+    if len(eval_context) > 2000:
+        eval_context = eval_context[:2000] + "\n...[Ngữ cảnh trích xuất đã được rút gọn để phục vụ đánh giá]..."
+
     prompt = (
         judge_prompt_template
         .replace("{question}", question)
-        .replace("{context}", context)
+        .replace("{context}", eval_context)
         .replace("{answer}", answer)
     )
 
@@ -225,51 +229,72 @@ async def run_eval(
                 f"Đang chạy câu hỏi [bold]{q_id}[/bold] ({q_type}): \"{question}\"..."
             )
 
-            # 1. Chạy qua Agent thật (agent loop)
-            answer = await run_agent(
-                question=question,
-                session=session,
-                run_id=run_id,
-                question_id=q_id,
-            )
-
-            # 2. Đọc trace log sinh ra từ logger.py
-            log_entries = read_run_log(run_id)
-            context, num_calls, p_tokens, c_tokens, cost = extract_trace_metrics(log_entries, q_id)
-
-            # 3. Đánh giá chất lượng
-            faithfulness_score: Optional[float] = None
-            refused_score: Optional[int] = None
-            retrieval_hit: Optional[float] = None
-
-            if q_type == "no_answer":
-                refused_score = check_refusal(answer, context)
-                faithfulness_score = None  # Không đo faithfulness cho câu no_answer
-            else:
-                faithfulness_score = judge_faithfulness(
-                    client=judge_client,
-                    judge_prompt_template=judge_template,
+            try:
+                # 1. Chạy qua Agent thật (agent loop)
+                answer = await run_agent(
                     question=question,
-                    context=context,
-                    answer=answer,
-                )
-                retrieval_hit = calculate_retrieval_hit(expected_docs, context)
-
-            eval_results.append(
-                EvalResult(
+                    session=session,
+                    run_id=run_id,
                     question_id=q_id,
-                    type=q_type,
-                    question=question,
-                    answer=answer,
-                    faithfulness=faithfulness_score,
-                    refused_correctly=refused_score,
-                    retrieval_hit=retrieval_hit,
-                    num_llm_calls=num_calls,
-                    prompt_tokens=p_tokens,
-                    completion_tokens=c_tokens,
-                    total_cost_estimate=cost,
                 )
-            )
+
+                # 2. Đọc trace log sinh ra từ logger.py
+                log_entries = read_run_log(run_id)
+                context, num_calls, p_tokens, c_tokens, cost = extract_trace_metrics(log_entries, q_id)
+
+                # 3. Đánh giá chất lượng
+                faithfulness_score: Optional[float] = None
+                refused_score: Optional[int] = None
+                retrieval_hit: Optional[float] = None
+
+                if q_type == "no_answer":
+                    refused_score = check_refusal(answer, context)
+                    faithfulness_score = None  # Không đo faithfulness cho câu no_answer
+                else:
+                    faithfulness_score = judge_faithfulness(
+                        client=judge_client,
+                        judge_prompt_template=judge_template,
+                        question=question,
+                        context=context,
+                        answer=answer,
+                    )
+                    retrieval_hit = calculate_retrieval_hit(expected_docs, context)
+
+                eval_results.append(
+                    EvalResult(
+                        question_id=q_id,
+                        type=q_type,
+                        question=question,
+                        answer=answer,
+                        faithfulness=faithfulness_score,
+                        refused_correctly=refused_score,
+                        retrieval_hit=retrieval_hit,
+                        num_llm_calls=num_calls,
+                        prompt_tokens=p_tokens,
+                        completion_tokens=c_tokens,
+                        total_cost_estimate=cost,
+                    )
+                )
+            except Exception as item_err:
+                console.print(f"[bold red]Lỗi khi xử lý câu {q_id}: {item_err}[/bold red]")
+                eval_results.append(
+                    EvalResult(
+                        question_id=q_id,
+                        type=q_type,
+                        question=question,
+                        answer=f"Error: {item_err}",
+                        faithfulness=0.0 if q_type != "no_answer" else None,
+                        refused_correctly=0 if q_type == "no_answer" else None,
+                        retrieval_hit=0.0 if expected_docs else None,
+                        num_llm_calls=0,
+                        prompt_tokens=0,
+                        completion_tokens=0,
+                        total_cost_estimate=0.0,
+                    )
+                )
+
+            # Nghỉ ngắn giữa các câu để hồi token bucket TPM của Groq
+            await asyncio.sleep(6.0)
 
     finally:
         await mcp_client.close()
