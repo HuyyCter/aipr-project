@@ -230,3 +230,4 @@
 2026-10-17 22:06:50,292 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
 2026-10-17 22:06:50,368 INFO __main__: search_regulations() được gọi: query='mục chấp hành nội quy tối đa bao nhiêu điểm', top_k=3
 2026-10-17 22:07:16,707 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 22:19:19,401 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}

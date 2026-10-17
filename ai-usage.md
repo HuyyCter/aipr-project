@@ -35,7 +35,6 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 
 **Dùng cho phần nào:**
 
-- [x] Lên kế hoạch lộ trình tiến độ, phân kỳ mốc merge code (`context/roadmap-sv2.md`)
 - [x] `agent/loop.py`
 - [ ] `agent/logger.py`
 - [x] `eval/evaluate.py`
@@ -49,15 +48,14 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 ```text
 1. [Thiết kế & Lộ trình] Phân tích yêu cầu đề tài T4 từ thư mục context, lập kế hoạch chi tiết các mốc tiến độ cho SV2 (LLM client, agent loop, evaluation) và ánh xạ với các bài lab W1-W7.
 2. [Đánh giá & Benchmark] Hướng dẫn xây dựng module evaluate.py và thiết kế prompts/judge.txt theo mô hình LLM-as-a-judge chấm Faithfulness, đo Correct Refusal Rate cho câu no_answer và trích xuất chi phí token từ log trace.
-3. [Tối ưu Token & Rate Limit] Phân tích lỗi Rate Limit của Groq API (TPM 8,000 vs TPD 200,000 tokens/ngày); hỗ trợ viết hàm prune_messages() trong loop.py để cắt gọn context và tối ưu cơ chế fail-fast trong llm_client.py.
+3. [Tối ưu Token & Rate Limit] Phân tích lỗi Rate Limit của Groq API (TPM 8,000 tokens/phút); hỗ trợ viết hàm prune_messages() trong loop.py để cắt gọn context chống lỗi HTTP 413.
 ```
 
 **Đoạn code nào do AI sinh (vs tự viết):**
 
-- AI hỗ trợ phân tích yêu cầu từ các file context, lập kế hoạch chi tiết 4 giai đoạn thực hiện, các mốc merge code, và xây dựng bảng ánh xạ trực tiếp từng đầu việc SV2 với các file tài liệu mẫu trong `context/roadmap-sv2.md`.
 - Trong `src/aipr_project/common/llm_client.py`:
   - Tự viết: Kế thừa hàm `_jina_embeddings` và cấu trúc `embed()` từ lab Week 3, tích hợp vào `LLMClient`.
-  - AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b`, xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP. Tinh chỉnh nâng cao: phân biệt rõ lỗi Rate Limit ngày (TPD) để ngắt ngay lập tức tránh retry vô ích và chỉ chờ hồi phục đối với lỗi Rate Limit phút (TPM); dọn dẹp code thừa và hoàn thiện cơ chế bắt lỗi Jina 401/403.
+  - AI hỗ trợ: Sinh cấu trúc hàm `chat()` tích hợp model chuẩn `openai/gpt-oss-20b`, xử lý cơ chế retry exponential backoff và phân loại lỗi HTTP (ngắt khi 401/403/404, retry khi 429/5xx); dọn dẹp code thừa và hoàn thiện cơ chế bắt lỗi Jina 401/403.
 - Trong `src/aipr_project/agent/loop.py`:
   - Tự viết: Cài đặt luồng vòng lặp ReAct, kết nối `mcp_client.connect()` / `discover()`, cơ chế ngắt trần `MAX_STEPS = 6` và parse tham số `tool_calls` an toàn.
   - AI hỗ trợ: Bổ sung hàm `prune_messages()` tự động rút gọn các `tool_result` cũ khi chuỗi hội thoại vượt ngưỡng 10,000 ký tự nhằm chống tràn Rate Limit TPM (8,000 tokens) và lỗi HTTP 413 của Groq; bọc `try...except` quanh `client.chat()` chống sập luồng agent.

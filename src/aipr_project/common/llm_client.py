@@ -172,17 +172,8 @@ class LLMClient:
                     )
                     raise e
 
+                # Kiểm tra lỗi Rate Limit (429 hoặc 413 do chạm hạn mức TPM theo phút)
                 msg_lower = (e.message or "").lower()
-
-                # Kiểm tra lỗi cạn kiệt hạn mức ngày (Tokens Per Day - TPD): dừng ngay, không retry vô ích
-                if e.status_code == 429 and ("tokens per day" in msg_lower or "tpd" in msg_lower):
-                    print(
-                        f"[CRITICAL Rate Limit TPD] Đã chạm trần hạn mức ngày của Groq (Tokens Per Day): {e.message}. Ngắt ngay, không retry.",
-                        file=sys.stderr,
-                    )
-                    raise e
-
-                # Kiểm tra lỗi Rate Limit theo phút (TPM / 429 thông thường): chờ hồi phục bucket
                 is_rate_limit = (
                     e.status_code == 429
                     or (e.status_code == 413 and "tokens per minute" in msg_lower)
