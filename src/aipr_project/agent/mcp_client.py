@@ -29,7 +29,7 @@ async def connect() -> Client:
 
 async def discover(session: Client) -> list[Tool]:
     tools = (await session.list_tools()).tools
-    print(f"Discovered {len(tools)} tools:")
+    print(f"Discovered {len(tools)} tools: {[tool.name for tool in tools]}")
     return tools
 
 

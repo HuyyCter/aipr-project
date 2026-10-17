@@ -119,6 +119,68 @@
 2026-10-14 09:13:41,088 INFO __main__: search_regulations() được gọi: query='học phí học kỳ', top_k=3
 2026-10-14 09:13:44,919 INFO __main__: search_regulations() được gọi: query='học phí học kỳ 2024', top_k=5
 2026-10-14 09:14:21,922 INFO __main__: search_regulations() được gọi: query='học phí', top_k=5
+2026-10-16 09:22:45,858 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-16 09:22:47,255 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-16 09:22:51,469 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-16 09:23:17,486 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 09:23:47,622 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 09:24:24,771 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 09:25:02,023 INFO __main__: search_regulations() được gọi: query='thời hạn khiếu nại', top_k=5
+2026-10-16 09:25:46,379 INFO __main__: search_regulations() được gọi: query='khiếu nại kết quả rèn luyện một tuần kể từ ngày công bố', top_k=5
+2026-10-16 09:26:03,948 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị xã hội thay đổi quy định năm trước', top_k=5
+2026-10-16 09:26:32,937 INFO __main__: get_document() được gọi: doc_id='DOC0002'
+2026-10-16 10:01:13,360 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-16 10:01:14,582 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-16 10:01:19,908 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-16 10:01:29,814 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:01:59,927 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:02:03,998 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:02:38,456 INFO __main__: search_regulations() được gọi: query='thời hạn khiếu nại', top_k=5
+2026-10-16 10:03:23,383 INFO __main__: search_regulations() được gọi: query='khiếu nại kết quả rèn luyện một tuần kể từ ngày công bố', top_k=5
+2026-10-16 10:03:40,824 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị-xã hội thay đổi quy định năm trước', top_k=5
+2026-10-16 10:09:40,990 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-16 10:09:42,335 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-16 10:09:46,533 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-16 10:10:15,028 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:10:45,750 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:11:15,972 INFO __main__: search_regulations() được gọi: query='một tuần', top_k=10
+2026-10-16 10:11:56,383 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị xã hội thay đổi quy định năm trước', top_k=5
+2026-10-16 10:12:23,720 INFO __main__: get_document() được gọi: doc_id='DOC0002'
+2026-10-16 10:32:57,214 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-16 10:32:58,567 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-16 10:33:02,088 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-16 10:33:03,874 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:33:25,962 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:33:41,461 INFO __main__: search_regulations() được gọi: query='Điều 16 Quy định đánh giá kết quả rèn luyện', top_k=5
+2026-10-16 10:34:21,106 INFO __main__: search_regulations() được gọi: query='Điều 16 Quy định đánh giá kết quả rèn luyện', top_k=10
+2026-10-16 10:35:12,448 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:35:13,576 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị xã hội thay đổi quy định năm trước', top_k=5
+2026-10-16 10:36:23,824 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-16 10:36:25,440 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-16 10:36:30,772 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-16 10:36:55,802 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:36:58,752 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:37:30,046 INFO __main__: search_regulations() được gọi: query='thời hạn khiếu nại đánh giá rèn luyện', top_k=5
+2026-10-16 10:37:44,173 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:38:24,442 INFO __main__: search_regulations() được gọi: query='một tuần từ ngày công bố', top_k=5
+2026-10-16 10:38:39,722 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị xã hội thay đổi quy định năm trước', top_k=5
+2026-10-16 10:38:49,677 INFO __main__: search_regulations() được gọi: query='Quy chế điểm rèn luyện thay đổi năm trước', top_k=5
+2026-10-16 10:39:22,049 INFO __main__: get_document() được gọi: doc_id='DOC0002'
+2026-10-16 10:39:37,461 INFO __main__: search_regulations() được gọi: query='chính trị xã hội điểm rèn luyện DOC0002', top_k=5
+2026-10-16 10:44:34,346 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-16 10:44:35,874 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-16 10:44:39,209 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-16 10:44:57,374 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-16 10:45:18,689 INFO __main__: search_regulations() được gọi: query='khiếu nại trong thời hạn', top_k=5
+2026-10-16 10:45:51,367 INFO __main__: search_regulations() được gọi: query='kể từ ngày công bố', top_k=5
+2026-10-16 10:46:09,843 INFO __main__: search_regulations() được gọi: query='hai tuần', top_k=5
+2026-10-16 10:47:10,034 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị-xã hội thay đổi quy định năm trước', top_k=5
+2026-10-17 16:57:21,418 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 16:57:21,598 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-17 16:57:21,986 INFO __main__: get_appeal_by_id() được gọi: appeal_id='4050dca2'
+2026-10-17 16:57:22,007 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-17 16:57:22,010 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-17 16:57:22,014 INFO __main__: list_appeals() được gọi: student_id='Huy'
 2026-10-17 19:01:07,783 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
 2026-10-17 19:40:32,324 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
 2026-10-17 19:40:33,580 INFO __main__: search_regulations() được gọi: query='mục ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3

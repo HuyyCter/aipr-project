@@ -4,7 +4,7 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 
 ---
 
-## SV1 — Tầng (a) Tra cứu + Agent Loop + MCP Client
+## SV1 — RAG Pipeline
 
 **Công cụ AI đã dùng:** _(ví dụ: Claude, ChatGPT, GitHub Copilot...)_
 
@@ -29,7 +29,7 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 
 ---
 
-## SV2 — Agent Loop (W6) + Evaluation (W5) + LLM Client (W2)
+## SV2 — Agent Loop 
 
 **Công cụ AI đã dùng:** Antigravity (Google Gemini)
 
@@ -71,28 +71,31 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 
 ---
 
-## SV3 — Tầng (c) Hành động + Verify
+## SV3 — MCP Server / Client
 
-**Công cụ AI đã dùng:** **\_**
+**Công cụ AI đã dùng:** Claude
 
-**Dùng cho phần nào:**
+**Đoạn code nào trong file nào do AI viết:**
+- `mcp_server/server.py`: 
+  + Dùng AI viết các docstring của các tools.
+  + Dùng AI viết 2 hàm HELPER hỗ trợ format hiển thị.
 
-- [ ] `domain/appeals_store.py`
-- [ ] `agent/logger.py`
-- [ ] Khác: \_\_\_
+- `agent/mcp_client.py`:
+  + Dùng AI gợi ý sử dụng AsyncExitStack() để không phải đóng mở MCP trong cùng 1 khối code như async with.
+  + Dùng AI hỗ trợ viết phần hàm main() để chạy thử mcp_client.
 
-**Prompt chính đã dùng:**
+- `domain/appeals_store.py`:
+  + Dùng AI hỗ trợ dựng skeleton (các tên hàm kèm tham số) và viết docstring.
 
-```
-(điền sau)
-```
-
-**Đoạn code nào do AI sinh (vs tự viết):**
+- `domain/scoring.py`:
+  + Dùng AI hỗ trợ dựng skeleton (các tên hàm kèm tham số) và viết docstring.
+  + Dùng AI tìm ra cách xác định danh mục khiếu nại dựa trên keyword (_KEYWORDS: list[tuple[str, tuple[str, ...]]])
+  + Dùng AI hỗ trợ liệt kê thứ tự các bước để tính điểm.
 
 ---
 
 ## Việc chung cả nhóm
 
-**Công cụ AI đã dùng cho:** README.md, project-structure.md, interface-contract.md, phân công nhiệm vụ, report.docx (nếu có hỗ trợ).
+**Công cụ AI đã dùng cho:** README.md, project-structure.md, interface-contract.md, phân công nhiệm vụ, report.docx.
 
 **Ghi chú:** các file tài liệu trên được soạn với sự hỗ trợ của AI (Claude) theo đúng yêu cầu đề bài 02-Yeu-cau-Thuc-hien.pdf và 01-De-tai-upload-for-student.pdf; nội dung code (`src/`) do từng thành viên tự viết, có AI hỗ trợ ở mức độ khai báo riêng từng người ở trên.
