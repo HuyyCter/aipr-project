@@ -59,8 +59,6 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 10. Kiem tra lich su ai tao 10 cau trong testset, vi sao co DOC0003 va DOC0004 trong khi project moi co 2 file
 11. Chuan hoa bo 20 cau hoi testset.jsonl (chia 5 type ro rang, bo sung q15 thieu du lieu va chu thich nhom)
 12. Dieu chinh lai testset.expected_doc_ids: loai bo DOC0003 va DOC0004 (chi con DOC0001 va DOC0002) de khop voi kho source_docs thuc te
-13. Xu ly loi HTTP 413 (Rate limit TPM 8,000 tokens) va crash o cau q08 khi chay evaluate: cai dat context pruning trong loop.py, cat ngan context trong judge_faithfulness, them try-catch per-item va delay hoi token trong evaluate.py
-14. Tinh chinh bo testset.jsonl xuong 13 cau chuan (danh so q01-q13 lien tuc, bo sung cau tieng Anh q03, q05, q13, giu day du 5 nhom va 4 cau no_answer)
 ```
 
 **Đoạn code nào do AI sinh (vs tự viết):**
@@ -72,12 +70,10 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 - Trong `prompts/judge.txt`:
   - AI sinh toàn bộ nội dung prompt cho mô hình LLM-as-a-judge (tách câu trả lời thành atomic claims, đối chiếu ngữ cảnh truy hồi, xuất định dạng JSON chấm điểm Faithfulness).
 - Trong `src/aipr_project/eval/evaluate.py`:
-  - AI sinh toàn bộ khung sườn và hoàn thiện code chạy đánh giá hệ thống Agentic RAG qua testset thật (kết nối MCP Server thật qua stdio, trích xuất retrieved context và token usage từ trace logs, gọi LLM judge chấm Faithfulness, đo Refusal Rate cho câu `no_answer`, đo Retrieval Hit Rate, xuất báo cáo CSV và in Rich Table). Bổ sung cơ chế cắt ngắn context trong `judge_faithfulness`, bọc `try...except` độc lập cho từng câu và thêm `asyncio.sleep(2.0)` hồi token bucket.
-- Trong `src/aipr_project/agent/loop.py`:
-  - AI hỗ trợ: Bổ sung hàm `prune_messages()` tự động cắt gọn kết quả `tool_result` cũ khi chuỗi hội thoại dài vượt ngưỡng an toàn, chống tràn TPM 8,000 tokens của Groq; bọc `try...except` quanh `client.chat()` chống sập luồng agent.
+  - AI sinh toàn bộ khung sườn và hoàn thiện code chạy đánh giá hệ thống Agentic RAG qua testset thật (kết nối MCP Server thật qua stdio, trích xuất retrieved context và token usage từ trace logs, gọi LLM judge chấm Faithfulness, đo Refusal Rate cho câu `no_answer`, đo Retrieval Hit Rate, xuất báo cáo CSV và in Rich Table).
 - Trong `tests/testset.jsonl`:
   - Tự viết: Đóng góp và mở rộng các câu hỏi tình huống tiếng Việt và tiếng Anh.
-  - AI hỗ trợ: Chuẩn hóa bộ 13 câu hỏi đạt chuẩn đặc tả $\ge 12$ câu (đánh số liên tục từ `q01` đến `q13`, phủ đủ 5 nhóm câu hỏi, có 3 câu tiếng Anh `q03`, `q05`, `q13` và 4 câu `no_answer`).
+  - AI hỗ trợ: Bổ sung câu `q15` (thiếu dữ liệu đầu vào), chèn các dòng comment phân nhóm và hỗ trợ `evaluate.py` đọc bỏ qua dòng comment; chuẩn hóa toàn bộ `expected_doc_ids` loại bỏ các mã giả định `DOC0003`, `DOC0004` để chỉ còn `DOC0001` và `DOC0002` khớp chuẩn xác với kho tài liệu thực tế `data/source_docs/`.
 
 ---
 

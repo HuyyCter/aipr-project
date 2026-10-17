@@ -1,0 +1,14 @@
+question_id,type,faithfulness,refused_correctly,retrieval_hit,num_llm_calls,prompt_tokens,completion_tokens,total_cost_estimate
+q01,direct,1.00,,1.00,2,4619,293,0.000869
+q02,direct,0.00,,1.00,6,20158,738,0.003466
+q03,direct,0.50,,1.00,3,8023,825,0.001698
+q04,synthesis,0.20,,1.00,4,12806,966,0.002501
+q05,synthesis,0.00,,1.00,6,21707,462,0.003533
+q06,calc,0.00,,1.00,3,8962,662,0.001741
+q07,calc,0.00,,0.00,1,1951,397,0.000531
+q08,action,0.00,,0.00,1,1954,154,0.000385
+q09,action,0.00,,0.00,1,1964,184,0.000405
+q10,no_answer,,0,,6,22844,874,0.003951
+q11,no_answer,,1,,4,12643,460,0.002172
+q12,no_answer,,0,,6,20696,556,0.003438
+q13,no_answer,,0,,1,1940,256,0.000445

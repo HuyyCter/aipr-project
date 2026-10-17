@@ -31,3 +31,6 @@ Thumbs.db
 dist/
 build/
 *.egg
+
+# Report documents (do not commit)
+*.docx
