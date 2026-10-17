@@ -6,13 +6,75 @@ Dùng:
 """
 
 import asyncio
+import json
 import sys
 
 from aipr_project.agent import mcp_client
-from aipr_project.agent.logger import generate_run_id
+from aipr_project.agent.logger import generate_run_id, read_run_log
 from aipr_project.agent.loop import run_agent
+from aipr_project.eval.evaluate import (
+    OUTPUT_JSON,
+    build_report,
+    is_agent_error,
+    load_testset,
+    score_answers,
+)
 
 EXIT_WORDS = {"exit", "quit", "thoat", "thoát"}
+
+
+def save_report(report: dict) -> None:
+    OUTPUT_JSON.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_JSON.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+
+
+async def run_eval() -> None:
+    """Chạy lần lượt testset theo đúng pattern của chat, rồi chấm điểm."""
+    run_id = generate_run_id()
+    test_set = load_testset()
+    answers: list[str] = []
+
+    session = await mcp_client.connect()
+    try:
+        for i, case in enumerate(test_set, 1):
+            print(f"[{i}/{len(test_set)}] {case.id}: {case.question}")
+            answer = await ask(case.question, session, run_id, case.id)
+            answers.append(answer or "Error: agent lỗi")
+            print(f"  -> {answers[-1][:120]}...\n")
+    finally:
+        await mcp_client.close()
+
+    run_log = read_run_log(run_id)
+
+    # Lưu ngay (chưa có RAGAS) để lỡ RAGAS lỗi vẫn còn số liệu
+    save_report(build_report(test_set, answers, run_log, run_id, []))
+    print(f"[log] {OUTPUT_JSON} (chưa có RAGAS)")
+
+    # RAGAS chỉ chấm câu có ground_truth và agent không lỗi
+    scored = [
+        (c, a)
+        for c, a in zip(test_set, answers)
+        if c.ground_truth and not is_agent_error(a)
+    ]
+    ragas_df, scored_ids = None, []
+    if scored:
+        cases = [c for c, _ in scored]
+        scored_ids = [c.id for c in cases]
+        print(f"\nChấm RAGAS {len(scored)} câu...")
+        try:
+            result = await asyncio.to_thread(
+                score_answers, cases, [a for _, a in scored], run_id
+            )
+            ragas_df = result.to_pandas()
+        except Exception as error:
+            print(f"RAGAS lỗi: {error}", file=sys.stderr)
+
+    report = build_report(test_set, answers, run_log, run_id, scored_ids, ragas_df)
+    save_report(report)
+    print(json.dumps(report["summary"], ensure_ascii=False, indent=2))
+    print(f"[log] {OUTPUT_JSON}")
 
 
 async def ask(
@@ -37,6 +99,10 @@ async def ask(
 
 
 async def main() -> None:
+    if "--eval" in sys.argv:
+        await run_eval()
+        return
+
     run_id = generate_run_id()
     one_shot = " ".join(sys.argv[1:]).strip()
 

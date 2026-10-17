@@ -1,0 +1,42 @@
+[
+  {
+    "id": "q01",
+    "answer": "Mục **“Ý thức chấp hành nội quy, quy chế”** trong khung đánh giá kết quả rèn luyện của sinh viên tại HCMUTE có **điểm tối đa 25 điểm**.\n\n> **Nguồn**:  \n> *[DOC0001] Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy – Trường Đại học Sư phạm Kỹ thuật TP.HCM (phiên bản 2021‑v1, 2021)*  \n> “Khung điểm đánh giá từ 0 điểm đến **25 điểm**.”"
+  },
+  {
+    "id": "q02",
+    "answer": "Đã vượt quá số bước xử lý cho phép."
+  },
+  {
+    "id": "q03",
+    "answer": "Khi quy chế điểm rèn luyện được cập nhật, **điểm rèn luyện của học kỳ hiện tại luôn tính theo quy chế mới nhất** (được áp dụng trong học kỳ đó).  \n\nTheo Sổ tay sinh viên khoá 2024 (phiên bản 2024‑v1), mục **3.3. Đánh giá về ý thức và kết quả tham gia các hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể thao, phòng chống tội phạm và các tệ nạn xã hội** (điểm tối đa 20 đ) là tiêu chí đánh giá chính cho hoạt động chính trị‑xã hội.  \n\n> **[DOC0002] Sổ tay sinh viên khoá 2024 – “Quy định đánh giá kết quả rèn luyện của sinh viên”**  \n> 3.3. Đánh giá về ý thức và kết quả tham gia các hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể thao, phòng chống tội phạm và các tệ nạn xã hội (từ 0 điểm đến 20 điểm)…\n\nNếu quy chế đã thay đổi so với năm trước (ví dụ quy định năm 2021 – DOC0001), thì **điểm rèn luyện của học kỳ này sẽ được tính theo quy chế 2024**. Điều này đồng nghĩa với việc các minh chứng, hồ sơ tham gia hoạt động chính trị‑xã hội trong học kỳ hiện tại sẽ được đánh giá dựa trên khung điểm và tiêu chí mới nhất, không còn áp dụng khung điểm của năm trước."
+  },
+  {
+    "id": "q04",
+    "answer": "Xin chào! Để tính điểm rèn luyện và xếp loại cho sinh viên **SV001** trong học kỳ này, mình cần biết điểm từng mục sau:\n\n| Mục | Tên đầy đủ | Điểm tối đa |\n|-----|------------|-------------|\n| **hoc_tap** | Ý thức học tập | 20 |\n| **chap_hanh_noi_quy** | Ý thức chấp hành nội quy | 25 |\n| **chinh_tri_xa_hoi** | Hoạt động chính trị – xã hội, văn hóa, thể thao | 20 |\n| **pham_chat_cong_dan** | Phẩm chất công dân và quan hệ cộng đồng | 25 |\n| **cong_tac_lop_doan_hoi** | Phụ trách công tác lớp, đoàn thể | 10 |\n\nBạn vui lòng cung cấp điểm cho từng mục trên (điểm nguyên). Nếu bạn đã xác nhận điểm trên hệ thống, hãy cho mình biết nhé. Sau khi có dữ liệu, mình sẽ tính tổng điểm và xếp loại cho bạn."
+  },
+  {
+    "id": "q05",
+    "answer": "Xin lỗi, để tính tổng điểm rèn luyện của sinh viên **SV002** cần có điểm cho **các 5 tiêu chí**:\n\n| Mục | Tiêu chí | Điểm tối đa |\n|-----|----------|-------------|\n| 1 | Ý thức học tập | 20 |\n| 2 | Ý thức chấp hành nội quy | 25 |\n| 3 | Hoạt động chính trị‑xã hội | 20 |\n| 4 | Phẩm chất công dân và quan hệ cộng đồng | 25 |\n| 5 | Phụ trách công tác lớp, đoàn thể | 10 |\n\nBạn vui lòng cung cấp điểm cho từng mục (hoặc cho biết “chưa nộp” nếu chưa có minh chứng). Khi đã có đầy đủ 5 điểm, mình sẽ tính tổng và xếp loại cho bạn."
+  },
+  {
+    "id": "q06",
+    "answer": "Xin chào! Để tiến hành nộp đơn khiếu nại, vui lòng cung cấp mã sinh viên (ví dụ: SV001) của bạn. Sau khi nhận được mã, chúng tôi sẽ tiến hành nộp đơn với lý do “còn thiếu 1 minh chứng chưa được tính vào điểm” cho mục “hoạt động chính trị-xã hội”."
+  },
+  {
+    "id": "q07",
+    "answer": "Xin lỗi, hiện tại tôi không tìm thấy thông tin liên quan đến tiêu chí xét học bổng khuyến khích học tập trong cơ sở dữ liệu quy chế của trường. Nếu bạn có tài liệu cụ thể hoặc muốn tra cứu chi tiết hơn, vui lòng cung cấp thêm thông tin hoặc tham khảo trực tiếp Sổ tay sinh viên / Quy định học bổng của HCMUTE."
+  },
+  {
+    "id": "q08",
+    "answer": "Xin lỗi, hiện tại tôi chỉ hỗ trợ các vấn đề liên quan đến quy chế điểm rèn luyện và quy trình khiếu nại tại HCMUTE. Nếu bạn có câu hỏi về những chủ đề này, mình rất sẵn lòng giúp đỡ."
+  },
+  {
+    "id": "q09",
+    "answer": "Xin lỗi, hiện tại không tìm thấy nội dung liên quan đến “thời gian tốt nghiệp sớm” trong cơ sở dữ liệu quy chế của trường. Nếu bạn có thêm thông tin cụ thể hơn (ví dụ tên văn bản, số hiệu, hoặc từ khóa khác), mình sẽ cố gắng tra cứu lại."
+  },
+  {
+    "id": "q10",
+    "answer": "Xin lỗi, hiện tại tôi không tìm thấy quy định cụ thể nào trong cơ sở dữ liệu về thủ tục xin nghỉ học tạm thời và các giấy tờ cần thiết. Bạn có thể tham khảo Sổ tay sinh viên hoặc liên hệ trực tiếp với phòng Học vụ của trường để được hướng dẫn chi tiết."
+  }
+]

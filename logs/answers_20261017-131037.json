@@ -1,0 +1,50 @@
+[
+  {
+    "id": "q01",
+    "answer": "Mục **Ý thức chấp hành nội quy, quy chế** được quy định trong “Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy” (phiên bản 2021‑v1) có khung điểm từ **0 đến 25 điểm**.  \n\n> **[DOC0001]** “Khung điểm đánh giá từ 0 điểm đến 25 điểm” (đoạn 2.1.2).  \n\nVì vậy, điểm tối đa cho mục này là **25 điểm**."
+  },
+  {
+    "id": "q02",
+    "answer": "Theo quy định của Trường Đại học Sư phạm Kỹ thuật TP.HCM, sinh viên có thể nộp khiếu nại kết quả đánh giá rèn luyện **trong vòng một tuần (7 ngày) kể từ ngày công bố kết quả** trên trang online của trường.  \n\n> **Nguồn**: *Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy* (DOC0001) – “Sinh viên được quyền khiếu nại hoặc đề nghị bổ sung nội dung đánh giá rèn luyện ... chỉ được thực hiện quyền này trong thời hạn một tuần sau khi đơn vị đó công bố nội dung đánh giá rèn luyện trên trang online SV.”"
+  },
+  {
+    "id": "q03",
+    "answer": "Khi quy chế điểm rèn luyện được cập nhật, **các sinh viên phải tính điểm theo quy chế mới nhất** (được ban hành trong năm học hiện tại).  \n\nTheo quy định trong **Sổ tay sinh viên khoá 2024 (DOC0002)**, phần “Đánh giá kết quả rèn luyện” ghi rõ:\n\n> “**3.3. Đánh giá về ý thức và kết quả tham gia các hoạt động chính trị, xã hội, văn hóa, văn nghệ, thể thao, phòng chống tội phạm và các tệ nạn xã hội (từ 0 điểm đến 20 điểm), bao gồm:  \n> a) Ý thức và hiệu quả tham gia các hoạt động rèn luyện về chính trị, xã hội, văn hóa, văn nghệ, thể thao;**”  \n\n(đoạn trích từ DOC0002, phiên bản 2024‑v1, 2024)\n\nDo đó, nếu sinh viên có minh chứng tham gia hoạt động chính trị‑xã hội trong học kỳ này và quy chế đã được sửa đổi so với năm trước, điểm rèn luyện của học kỳ đó sẽ được tính dựa trên **quy chế 2024** – phiên bản mới nhất.  \n\nNếu bạn cần tham khảo chi tiết hơn về khung điểm hoặc các tiêu chí đánh giá, bạn có thể yêu cầu tra cứu thêm các đoạn văn liên quan."
+  },
+  {
+    "id": "q04",
+    "answer": "Error: agent lỗi"
+  },
+  {
+    "id": "q05",
+    "answer": "Xin chào! Để tính điểm rèn luyện và xếp loại cho sinh viên **SV001** trong học kỳ này, mình cần biết điểm của từng tiêu chí sau:\n\n| Tiêu chí | Điểm tối đa |\n|----------|-------------|\n| **học tập** (Ý thức học tập) | 20 |\n| **chấp hành nội quy** (Ý thức chấp hành nội quy) | 25 |\n| **hoạt động chính trị‑xã hội** (Hoạt động chính trị - xã hội, văn hoá, thể thao) | 20 |\n| **phẩm chất công dân** (Phẩm chất công dân và quan hệ cộng đồng) | 25 |\n| **công tác lớp, đoàn thể** (Phụ trách công tác lớp, đoàn thể) | 10 |\n\nBạn vui lòng cung cấp điểm của từng mục (điểm nguyên) và cho biết đã xác nhận điểm trên hệ thống chưa (đúng/không). Khi đã có đầy đủ thông tin, mình sẽ tính tổng điểm và xếp loại cho bạn."
+  },
+  {
+    "id": "q06",
+    "answer": "Xin chào! Để tính tổng điểm rèn luyện của sinh viên **SV002**, tôi cần biết điểm của **5 tiêu chí**:\n\n| Tiêu chí | Mã | Điểm tối đa |\n|----------|----|-------------|\n| Ý thức học tập | `hoc_tap` | 20 |\n| Ý thức chấp hành nội quy | `chap_hanh_noi_quy` | 25 |\n| Hoạt động chính trị‑xã hội | `chinh_tri_xa_hoi` | 20 |\n| Phẩm chất công dân và quan hệ cộng đồng | `pham_chat_cong_dan` | 25 |\n| Phụ trách công tác lớp, đoàn thể | `cong_tac_lop_doan_hoi` | 10 |\n\nBạn đã cho biết rằng **minh chứng mục hoạt động chính trị‑xã hội chưa được nộp**, vì vậy tôi chưa có điểm cho tiêu chí `chinh_tri_xa_hoi`.  \nBạn vui lòng cung cấp điểm (từ 0 đến 20) cho tiêu chí này, cùng với điểm của các tiêu chí còn lại, để tôi có thể tính tổng điểm và xếp loại cho sinh viên."
+  },
+  {
+    "id": "q07",
+    "answer": "Chào bạn! Để tiến hành nộp đơn khiếu nại, mình cần biết mã sinh viên của bạn. Bạn vui lòng cung cấp mã sinh viên (ví dụ: SV001) để mình có thể tạo hồ sơ khiếu nại cho bạn."
+  },
+  {
+    "id": "q08",
+    "answer": "Chào bạn! Để nộp đơn khiếu nại điểm rèn luyện, mình cần một số thông tin từ bạn:\n\n1. **Mã sinh viên** (ví dụ: SV001)  \n2. **Mục điểm bị khiếu nại** (ví dụ: “chinh_tri_xa_hoi”, “hoc_tap”, …)  \n3. **Lý do khiếu nại** (mô tả ngắn gọn vì sao bạn cho rằng điểm sai)\n\nBạn vui lòng cung cấp các thông tin trên để mình tiến hành nộp đơn cho bạn."
+  },
+  {
+    "id": "q09",
+    "answer": "Error: agent lỗi"
+  },
+  {
+    "id": "q10",
+    "answer": "Xin lỗi, hiện tại tôi không tìm thấy thông tin về mức học phí học kỳ cho sinh viên hệ chính quy trong cơ sở dữ liệu quy chế của trường. Bạn có thể tham khảo:\n\n- Trang web chính thức của Trường Đại học Sư phạm Kỹ thuật TP.HCM (phần “Học phí & Học bổng”).\n- Liên hệ phòng Kế hoạch Tài chính hoặc phòng Học vụ để được cung cấp số liệu chính xác nhất.\n\nNếu bạn cần hỗ trợ tìm kiếm tài liệu cụ thể hơn, vui lòng cho tôi biết tên tài liệu hoặc số quyết định liên quan."
+  },
+  {
+    "id": "q11",
+    "answer": "Xin lỗi, hiện tại tôi không tìm thấy thông tin cụ thể về quy định thời gian tốt nghiệp sớm trong cơ sở dữ liệu quy chế của trường. Nếu bạn cần thông tin chi tiết hơn, bạn có thể tham khảo trực tiếp Sổ tay sinh viên hoặc quy định đánh giá kết quả rèn luyện, hoặc liên hệ phòng Đào tạo/Đoàn để được hướng dẫn."
+  },
+  {
+    "id": "q12",
+    "answer": "Xin lỗi, hiện tại tôi chỉ hỗ trợ các vấn đề liên quan đến quy chế điểm rèn luyện và quy trình khiếu nại tại HCMUTE. Nếu bạn cần hỗ trợ về việc báo cáo kính bị mất trong kỳ thi, vui lòng liên hệ trực tiếp với phòng công tác sinh viên hoặc bộ phận hỗ trợ sinh viên của trường. Chúc bạn sớm tìm lại kính!"
+  }
+]

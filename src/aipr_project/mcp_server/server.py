@@ -23,6 +23,7 @@ RUBRIC_PATH = PROJECT_ROOT / "data" / "rubric.json"
 
 NOT_FOUND_MESSAGE = "Không tìm thấy nội dung liên quan trong tài liệu."
 MAX_DOCUMENT_CHARS = 800
+MIN_VECTOR_SCORE = 0.45
 
 with open(RUBRIC_PATH, "r", encoding="utf-8") as f:
     RUBRIC = json.load(f)
@@ -105,7 +106,7 @@ def search_regulations(query: str, top_k: int = 3) -> str:
 
     Args:
         query: Câu hỏi hoặc từ khóa cần tìm, viết bằng tiếng Việt.
-        top_k: Số đoạn tối đa trả về (1-8, mặc định 3).
+        top_k: Số đoạn tối đa trả về (1-5, mặc định 3).
 
     Returns:
         Các đoạn cách nhau bằng "---", mỗi đoạn bắt đầu bằng dòng
@@ -120,7 +121,14 @@ def search_regulations(query: str, top_k: int = 3) -> str:
             return "Error: query không được rỗng."
 
         top_k = max(1, min(top_k, 3))
-        result = hybrid_search(query, CHUNKS, EMBEDDINGS, BM25, top_k=top_k)
+        result = hybrid_search(
+            query,
+            CHUNKS,
+            EMBEDDINGS,
+            BM25,
+            top_k=top_k,
+            min_vector_score=MIN_VECTOR_SCORE,
+        )
         if not result:
             return NOT_FOUND_MESSAGE
         return "\n=============\n".join(
@@ -132,7 +140,7 @@ def search_regulations(query: str, top_k: int = 3) -> str:
         return f"Error: không tìm kiếm được: {error}"
 
 
-@mcp_server.tool()
+# @mcp_server.tool()
 def get_document(doc_id: str) -> str:
     """
     Lấy toàn bộ nội dung một tài liệu theo mã. Dùng sau search_regulations khi một

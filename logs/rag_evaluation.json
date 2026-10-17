@@ -1,26 +1,246 @@
-[
-  {
-    "user_input":"Mục ý thức chấp hành nội quy, quy chế tối đa bao nhiêu điểm?",
-    "retrieved_contexts":[
-      "Điều 6. Đánh giá về ý thức và kết quả chấp hành nội quy, quy chế, quy định trong trường\n2. Khung điểm đánh giá từ 0 điểm đến 25 điểm."
+{
+  "summary": {
+    "run_id": "20261017-135222",
+    "n_questions": 12,
+    "agent_errors": [
+      "q04",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12"
     ],
-    "response":"Mục này có khung điểm từ 0 đến 25 điểm, tức tối đa 25 điểm (Điều 6, DOC0001).",
-    "reference":"Tối đa 25 điểm (Điều 6, DOC0001).",
-    "faithfulness":0.6666666667,
-    "answer_relevancy":0.607948423,
-    "context_precision":0.9999999999,
-    "context_recall":1.0
+    "ragas_scored_ids": [
+      "q01",
+      "q02",
+      "q03"
+    ],
+    "ragas_mean": {
+      "faithfulness": 0.3333,
+      "answer_relevancy": 0.7999,
+      "context_precision": 0.3942,
+      "context_recall": 0.5
+    },
+    "refusal": {
+      "no_answer_total": 4,
+      "correct_refusals": 0,
+      "correct_refusal_rate": 0.0,
+      "false_refusals_on_answerable": []
+    },
+    "usage": {
+      "total_calls": 17,
+      "total_prompt_tokens": 57645,
+      "total_completion_tokens": 3579,
+      "max_prompt": 6549
+    }
   },
-  {
-    "user_input":"Điểm rèn luyện từ 80 đến dưới 90 điểm thì xếp loại gì?",
-    "retrieved_contexts":[
-      "Điều 10. Phân loại kết quả rèn luyện\na) Từ 90 điểm đến 100 điểm: loại xuất sắc;\nb) Từ 80 điểm đến dưới 90 điểm: loại tốt;\nc) Từ 65 điểm đến dưới 80 điểm: loại khá;"
-    ],
-    "response":"Điểm từ 80 đến dưới 90 là loại tốt.",
-    "reference":"Loại tốt (Điều 10, DOC0001).",
-    "faithfulness":1.0,
-    "answer_relevancy":0.6942281012,
-    "context_precision":0.9999999999,
-    "context_recall":1.0
-  }
-]
+  "questions": [
+    {
+      "id": "q01",
+      "type": "direct",
+      "question": "Mục ý thức chấp hành nội quy, quy chế tối đa bao nhiêu điểm?",
+      "answer": "Mục **Ý thức chấp hành nội quy, quy chế** được quy định trong “Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy” (phiên bản 2021‑v1) có khung điểm từ **0 đến 25 điểm**.  \n\n> **[DOC0001]** “Khung điểm đánh giá từ 0 điểm đến 25 điểm” (đoạn 2.1.2).  \n\nVì vậy, điểm tối đa cho mục này là **25 điểm**.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 2,
+        "tool_calls": 1,
+        "prompt_tokens": 5253,
+        "completion_tokens": 261,
+        "max_prompt": 3018
+      },
+      "ragas": {
+        "faithfulness": 0.5,
+        "answer_relevancy": 0.7818,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      }
+    },
+    {
+      "id": "q02",
+      "type": "direct",
+      "question": "Hạn nộp khiếu nại kết quả đánh giá rèn luyện là bao lâu kể từ ngày công bố kết quả?",
+      "answer": "Hạn nộp khiếu nại (hoặc đề nghị bổ sung) kết quả đánh giá rèn luyện là **hai tuần kể từ ngày công bố kết quả** trên hệ thống.  \n> *Nguồn: [DOC0002] Sổ tay sinh viên khoá 2024 – “đề nghị bổ sung hoặc sửa đổi các nội dung còn thiếu hoặc sai lệch so với điểm kết quả được công bố trên phần mềm chuyên biệt … trong thời gian hai tuần kể từ ngày điểm được công bố.”*",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 4,
+        "tool_calls": 3,
+        "prompt_tokens": 13318,
+        "completion_tokens": 954,
+        "max_prompt": 4335
+      },
+      "ragas": {
+        "faithfulness": null,
+        "answer_relevancy": 0.9473,
+        "context_precision": 0.1825,
+        "context_recall": null
+      }
+    },
+    {
+      "id": "q03",
+      "type": "synthesis",
+      "question": "Nếu sinh viên có minh chứng tham gia hoạt động chính trị-xã hội ở cả học kỳ này và quy định đã thay đổi so với năm trước, thì tính theo quy chế nào?",
+      "answer": "Theo quy chế hiện hành của HCMUTE, khi có sự thay đổi trong quy định đánh giá hoạt động chính trị‑xã hội, **điều kiện áp dụng là quy chế mới nhất** (được ban hành trong năm học hiện tại).  \n\n> **Căn cứ**:  \n> - [DOC0002] *Sổ tay sinh viên khoá 2024* – “**QUY ĐỊNH ĐÁNH GIÁ KẾT QUẢ RÈN LUYỆN CỦA SINH VIÊN**” (đoạn 3.3).  \n>   - Đoạn này quy định rõ cách tính điểm cho hoạt động chính trị‑xã hội, văn hóa, thể thao, v.v.  \n> - Khi quy chế được sửa đổi, các quy định mới được áp dụng ngay cho học kỳ hiện tại, thay thế quy chế năm trước.\n\nVì vậy, nếu sinh viên có minh chứng tham gia hoạt động chính trị‑xã hội trong học kỳ này và quy định đã được cập nhật so với năm trước, bạn sẽ tính điểm dựa trên **quy chế 2024** (được ghi trong DOC0002). Nếu cần tham khảo chi tiết hơn, bạn có thể tra cứu lại đoạn 3.3 của *Sổ tay sinh viên khoá 2024* để biết các tiêu chí và mức điểm cụ thể.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 2,
+        "tool_calls": 1,
+        "prompt_tokens": 5309,
+        "completion_tokens": 584,
+        "max_prompt": 3055
+      },
+      "ragas": {
+        "faithfulness": 0.1667,
+        "answer_relevancy": 0.6706,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      }
+    },
+    {
+      "id": "q04",
+      "type": "synthesis",
+      "question": "So sánh khung xếp loại điểm rèn luyện của sinh viên giữa quy định năm 2021 và quy định năm 2024",
+      "answer": "Đã vượt quá số bước xử lý cho phép.",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 6,
+        "tool_calls": 6,
+        "prompt_tokens": 27026,
+        "completion_tokens": 873,
+        "max_prompt": 6549
+      },
+      "ragas": null
+    },
+    {
+      "id": "q05",
+      "type": "calc",
+      "question": "Với minh chứng hiện có của sinh viên SV001 trong học kỳ này, điểm rèn luyện là bao nhiêu và xếp loại gì?",
+      "answer": "Xin chào! Để tính điểm rèn luyện và xếp loại cho sinh viên **SV001** trong học kỳ này, mình cần biết điểm của từng tiêu chí sau:\n\n| Tiêu chí | Điểm tối đa |\n|----------|-------------|\n| **học tập** | 20 điểm |\n| **chấp hành nội quy** | 25 điểm |\n| **hoạt động chính trị‑xã hội** | 20 điểm |\n| **phẩm chất công dân** | 25 điểm |\n| **công tác lớp/đoàn** | 10 điểm |\n\nBạn vui lòng cung cấp điểm của SV001 cho từng mục trên (điểm nguyên). Khi đã có, mình sẽ tính tổng điểm, xếp loại và thông báo kết quả. Cảm ơn!",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2246,
+        "completion_tokens": 346,
+        "max_prompt": 2246
+      },
+      "ragas": null
+    },
+    {
+      "id": "q06",
+      "type": "calc",
+      "question": "Tính điểm rèn luyện của sinh viên SV002, biết minh chứng mục hoạt động chính trị-xã hội chưa được nộp.",
+      "answer": "Xin chào! Để tính tổng điểm rèn luyện của sinh viên **SV002**, tôi cần biết điểm của **5 tiêu chí**:\n\n| Tiêu chí | Mã | Điểm tối đa |\n|----------|----|-------------|\n| Ý thức học tập | `hoc_tap` | 20 |\n| Ý thức chấp hành nội quy | `chap_hanh_noi_quy` | 25 |\n| Hoạt động chính trị‑xã hội | `chinh_tri_xa_hoi` | 20 |\n| Phẩm chất công dân và quan hệ cộng đồng | `pham_chat_cong_dan` | 25 |\n| Phụ trách công tác lớp, đoàn thể | `cong_tac_lop_doan_hoi` | 10 |\n\nBạn đã cho biết rằng **minh chứng cho mục hoạt động chính trị‑xã hội chưa được nộp**, vì vậy tôi chưa có điểm cho mục `chinh_tri_xa_hoi`.  \nBạn vui lòng cung cấp điểm (từ 0 đến 20) cho mục này, hoặc cho biết bạn muốn tính điểm với mức trừ 10 điểm do chưa xác nhận?  \n\nSau khi nhận được thông tin, mình sẽ tính tổng điểm và xếp loại cho bạn.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2245,
+        "completion_tokens": 430,
+        "max_prompt": 2245
+      },
+      "ragas": null
+    },
+    {
+      "id": "q07",
+      "type": "action",
+      "question": "Tôi muốn khiếu nại điểm mục hoạt động chính trị-xã hội, lý do: còn thiếu 1 minh chứng chưa được tính vào điểm.",
+      "answer": "Chào bạn! Để tiến hành nộp đơn khiếu nại, mình cần biết mã sinh viên của bạn. Bạn vui lòng cung cấp mã sinh viên (ví dụ: SV001) để mình có thể tạo hồ sơ khiếu nại cho bạn.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2248,
+        "completion_tokens": 131,
+        "max_prompt": 2248
+      },
+      "ragas": null
+    },
+    {
+      "id": "q08",
+      "type": "action",
+      "question": "Tôi muốn nộp đơn khiếu nại điểm rèn luyện học kỳ này vì thấy kết quả bị sai lệch, nhờ hệ thống nộp đơn khiếu nại giúp tôi.",
+      "answer": "Error: agent lỗi",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 0,
+        "tool_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "max_prompt": 0
+      },
+      "ragas": null
+    },
+    {
+      "id": "q09",
+      "type": "no_answer",
+      "question": "Học bổng khuyến khích học tập xét theo những tiêu chí nào?",
+      "answer": "Error: agent lỗi",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 0,
+        "tool_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "max_prompt": 0
+      },
+      "ragas": null
+    },
+    {
+      "id": "q10",
+      "type": "no_answer",
+      "question": "Mức học phí học kỳ này của sinh viên hệ chính quy là bao nhiêu?",
+      "answer": "Error: agent lỗi",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 0,
+        "tool_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "max_prompt": 0
+      },
+      "ragas": null
+    },
+    {
+      "id": "q11",
+      "type": "no_answer",
+      "question": "Quy định về thời gian tốt nghiệp sớm là gì?",
+      "answer": "Error: agent lỗi",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 0,
+        "tool_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "max_prompt": 0
+      },
+      "ragas": null
+    },
+    {
+      "id": "q12",
+      "type": "no_answer",
+      "question": "I lost my glasses during an exam in room A101, how can i report it?",
+      "answer": "Error: agent lỗi",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 0,
+        "tool_calls": 0,
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "max_prompt": 0
+      },
+      "ragas": null
+    }
+  ]
+}
