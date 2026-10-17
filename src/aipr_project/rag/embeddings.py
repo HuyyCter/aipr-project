@@ -110,10 +110,8 @@ def cosine_similiarity(
     """Calculate cosine similarity between two vectors."""
     if len(a) != len(b):
         raise ValueError("Hai vector phải có cùng số chiều.")
-
     vector_a = np.asarray(a, dtype=np.float32)
     vector_b = np.asarray(b, dtype=np.float32)
-
     denominator = np.linalg.norm(vector_a) * np.linalg.norm(vector_b)
 
     if denominator == 0:
