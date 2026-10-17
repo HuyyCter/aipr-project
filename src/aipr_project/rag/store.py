@@ -10,6 +10,7 @@ from rank_bm25 import BM25Okapi
 from aipr_project.rag.models import Document, DocumentChunk
 from aipr_project.rag.chunking import chunk_documents
 from aipr_project.common.json_codec import save_chunks, load_chunks
+from aipr_project.rag.embeddings import embed_key, batch_embed_key
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -18,6 +19,7 @@ DEFAULT_CACHE_PATH = PROJECT_ROOT / "data" / "store_cache.json"
 DEFAULT_EMBEDDING_MODEL = "jina-embeddings-v3"
 DEFAULT_CHUNK_SIZE = 800
 DEFAULT_OVERLAP = 100
+EMBEDDING_BATCH_SIZE = 32
 
 
 def _tokenize(text: str) -> list[str]:
@@ -35,9 +37,10 @@ class DocumentStore:
     ):
         self._docs: dict[str, Document] = {}
         self._chunks: dict[str, DocumentChunk] = {}
-
         self.llm_client = llm_client
-        self.cache_path = Path(cache_path) if cache_path else DEFAULT_CACHE_PATH
+        self.cache_path = (
+            Path(cache_path) if cache_path else DEFAULT_CACHE_PATH
+        )
 
         self._load_cache()
 
@@ -50,9 +53,7 @@ class DocumentStore:
         if not self.cache_path.exists():
             return
 
-        cached_chunks = load_chunks(self.cache_path)
-
-        for chunk in cached_chunks:
+        for chunk in load_chunks(self.cache_path):
             self._chunks[chunk.chunk_id] = chunk
 
     def _save_cache(self) -> None:
@@ -63,7 +64,6 @@ class DocumentStore:
     # Documents and chunks
     # ---------------------------------------------------------
 
-    
     def add(self, doc: Document) -> str:
         """Add or update a document and remove obsolete chunks."""
         if not doc.doc_id:
@@ -71,7 +71,6 @@ class DocumentStore:
 
         self._docs[doc.doc_id] = doc
 
-        # Generate the current set of chunks for this document.
         new_chunks = chunk_documents(
             doc,
             chunk_size=DEFAULT_CHUNK_SIZE,
@@ -79,7 +78,7 @@ class DocumentStore:
         )
         new_chunk_ids = {chunk.chunk_id for chunk in new_chunks}
 
-        # Remove chunks that no longer belong to the updated document.
+        # Remove obsolete chunks when a document is updated.
         for chunk_id, old_chunk in list(self._chunks.items()):
             if (
                 old_chunk.doc_id == doc.doc_id
@@ -87,13 +86,12 @@ class DocumentStore:
             ):
                 del self._chunks[chunk_id]
 
-        # Reuse cached embeddings for unchanged chunk content.
+        # Reuse cached embeddings when the content is unchanged.
         for chunk in new_chunks:
             self.add_chunk(chunk, save=False)
 
         self._save_cache()
         return doc.doc_id
-
 
     def get(self, doc_id: str) -> Document | None:
         return self._docs.get(doc_id)
@@ -119,7 +117,7 @@ class DocumentStore:
         chunk: DocumentChunk,
         save: bool = True,
     ) -> str:
-        """Add a chunk, reusing its cached embedding when valid."""
+        """Add a chunk and reuse its cached embedding if valid."""
         if not chunk.chunk_id:
             chunk.chunk_id = f"CHUNK{len(self._chunks) + 1:04d}"
 
@@ -152,23 +150,12 @@ class DocumentStore:
             "chunks": len(self._chunks),
         }
 
+    # ---------------------------------------------------------
     # Embeddings
-    def _get_llm_client(self):
-        """Create the shared project's LLM client only when needed."""
-        if self.llm_client is None:
-            from aipr_project.common.llm_client import LLMClient
-
-            self.llm_client = LLMClient()
-
-        if not self.llm_client.jina_api_key:
-            raise RuntimeError(
-                "Thiếu JINA_API_KEY. Hãy kiểm tra file .env."
-            )
-
-        return self.llm_client
+    # ---------------------------------------------------------
 
     def _ensure_embeddings(self) -> None:
-        """Embed only chunks that do not already have an embedding."""
+        """Create embeddings only for chunks that lack them."""
         missing = [
             chunk
             for chunk in self._chunks.values()
@@ -178,16 +165,12 @@ class DocumentStore:
         if not missing:
             return
 
-        client = self._get_llm_client()
-        batch_size = 32
+        for start in range(0, len(missing), EMBEDDING_BATCH_SIZE):
+            batch = missing[start:start + EMBEDDING_BATCH_SIZE]
 
-        for start in range(0, len(missing), batch_size):
-            batch = missing[start:start + batch_size]
-
-            vectors = client.embed(
+            vectors = batch_embed_key(
                 [chunk.content for chunk in batch],
                 model=DEFAULT_EMBEDDING_MODEL,
-                task="retrieval.passage",
             )
 
             if len(vectors) != len(batch):
@@ -196,27 +179,31 @@ class DocumentStore:
                 )
 
             for chunk, vector in zip(batch, vectors):
+                if not vector:
+                    raise RuntimeError(
+                        f"Embedding rỗng cho chunk {chunk.chunk_id}."
+                    )
+
                 chunk.embedding = [float(value) for value in vector]
 
         self._save_cache()
 
     def _embed_query(self, query: str) -> list[float]:
-        """Embed a search query using the query-specific task."""
-        client = self._get_llm_client()
-
-        vectors = client.embed(
-            [query],
+        """Create an embedding for the search query."""
+        vector = embed_key(
+            query,
             model=DEFAULT_EMBEDDING_MODEL,
-            task="retrieval.query",
         )
 
-        if not vectors or not vectors[0]:
+        if not vector:
             raise RuntimeError("Không nhận được embedding cho query.")
 
-        return [float(value) for value in vectors[0]]
+        return [float(value) for value in vector]
 
+    # ---------------------------------------------------------
+    # BM25 retrieval
+    # ---------------------------------------------------------
 
-    # Retrieval
     def _bm25_search(
         self,
         query: str,
@@ -227,16 +214,14 @@ class DocumentStore:
         if not chunks or top_k <= 0:
             return []
 
-        tokenized_corpus = [
-            _tokenize(chunk.content)
-            for chunk in chunks
-        ]
+        corpus = [_tokenize(chunk.content) for chunk in chunks]
         query_tokens = _tokenize(query)
 
         if not query_tokens:
             return []
 
-        bm25 = BM25Okapi(tokenized_corpus)
+        # Empty tokenized documents can cause issues in some BM25 setups.
+        bm25 = BM25Okapi(corpus)
         scores = bm25.get_scores(query_tokens)
 
         ranked_indices = sorted(
@@ -250,6 +235,10 @@ class DocumentStore:
             for i in ranked_indices[:top_k]
             if scores[i] > 0
         ]
+
+    # ---------------------------------------------------------
+    # Dense retrieval
+    # ---------------------------------------------------------
 
     def _dense_search(
         self,
@@ -280,7 +269,7 @@ class DocumentStore:
                 "Kích thước embedding của query và chunks không khớp."
             )
 
-        # Jina trả về vector đã chuẩn hóa; dot product tương đương cosine.
+        # Valid for normalized embeddings.
         scores = matrix @ query_vector
 
         ranked_indices = np.argsort(scores)[::-1][:top_k]
@@ -290,6 +279,48 @@ class DocumentStore:
             for i in ranked_indices
         ]
 
+    # ---------------------------------------------------------
+    # Hybrid retrieval
+    # ---------------------------------------------------------
+
+    def _hybrid_search(
+        self,
+        query: str,
+        top_k: int,
+    ) -> list[tuple[DocumentChunk, float]]:
+        """Combine BM25 and Dense rankings using RRF."""
+        candidate_k = max(top_k * 3, 10)
+
+        bm25_results = self._bm25_search(query, candidate_k)
+        dense_results = self._dense_search(query, candidate_k)
+
+        rrf_scores: dict[str, float] = {}
+        chunks_by_id: dict[str, DocumentChunk] = {}
+        rrf_constant = 60
+
+        for results in (bm25_results, dense_results):
+            for rank, (chunk, _score) in enumerate(results, start=1):
+                chunks_by_id[chunk.chunk_id] = chunk
+                rrf_scores[chunk.chunk_id] = (
+                    rrf_scores.get(chunk.chunk_id, 0.0)
+                    + 1.0 / (rrf_constant + rank)
+                )
+
+        ranked = sorted(
+            rrf_scores.items(),
+            key=lambda item: item[1],
+            reverse=True,
+        )
+
+        return [
+            (chunks_by_id[chunk_id], score)
+            for chunk_id, score in ranked[:top_k]
+        ]
+
+    # ---------------------------------------------------------
+    # Public search API
+    # ---------------------------------------------------------
+
     def search(
         self,
         query: str,
@@ -297,12 +328,12 @@ class DocumentStore:
         mode: str = "hybrid",
     ) -> list[tuple[DocumentChunk, float]]:
         """
-        Search chunks using BM25, dense vectors, or hybrid rank fusion.
+        Search using BM25, Dense, or Hybrid retrieval.
 
         mode:
-            "bm25"   - lexical retrieval
+            "bm25"   - keyword-based retrieval
             "dense"  - embedding similarity
-            "hybrid" - reciprocal rank fusion of both rankings
+            "hybrid" - Reciprocal Rank Fusion of BM25 and Dense
         """
         if not query or not query.strip():
             return []
@@ -318,37 +349,10 @@ class DocumentStore:
         if mode == "bm25":
             return self._bm25_search(query, top_k)
 
+        # Dense and Hybrid require embeddings.
         self._ensure_embeddings()
 
         if mode == "dense":
             return self._dense_search(query, top_k)
 
-        # Reciprocal Rank Fusion avoids directly combining scores
-        # that have different scales.
-        candidate_k = max(top_k * 3, 10)
-
-        bm25_results = self._bm25_search(query, candidate_k)
-        dense_results = self._dense_search(query, candidate_k)
-
-        rrf_scores: dict[str, float] = {}
-        chunk_by_id: dict[str, DocumentChunk] = {}
-        rrf_constant = 60
-
-        for results in (bm25_results, dense_results):
-            for rank, (chunk, _score) in enumerate(results, start=1):
-                chunk_by_id[chunk.chunk_id] = chunk
-                rrf_scores[chunk.chunk_id] = (
-                    rrf_scores.get(chunk.chunk_id, 0.0)
-                    + 1.0 / (rrf_constant + rank)
-                )
-
-        ranked = sorted(
-            rrf_scores.items(),
-            key=lambda item: item[1],
-            reverse=True,
-        )
-
-        return [
-            (chunk_by_id[chunk_id], score)
-            for chunk_id, score in ranked[:top_k]
-        ]
+        return self._hybrid_search(query, top_k)
