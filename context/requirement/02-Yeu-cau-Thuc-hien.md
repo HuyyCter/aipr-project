@@ -46,7 +46,7 @@ Bảo vệ: 20 phút/nhóm gồm vấn đáp và sửa code trực tiếp trên 
 
 ## 4. Cấu trúc report Word (theo đúng khung, 8–9 trang)
 
-| # | Mục |   | Trang Nội dung phải có |
+| # | Mục | Trang | Trang Nội dung phải có |
 | --- | --- | --- | --- |
 | 1 | Vấn đề, phạm vi, giả định | 0.5–1 | Bài toán, người dùng, và hệ thống KHÔNG làm gì |
 | 2 | Kiến trúc tổng thể | 1 | Sơ đồ agent/tool/MCP boundary + luồng xử lý 1 câu hỏi mẫu |
