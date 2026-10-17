@@ -175,3 +175,9 @@
 2026-10-16 10:45:51,367 INFO __main__: search_regulations() được gọi: query='kể từ ngày công bố', top_k=5
 2026-10-16 10:46:09,843 INFO __main__: search_regulations() được gọi: query='hai tuần', top_k=5
 2026-10-16 10:47:10,034 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị-xã hội thay đổi quy định năm trước', top_k=5
+2026-10-17 16:57:21,418 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 16:57:21,598 INFO __main__: submit_appeal() được gọi: student_id='SV001', category='chinh_tri_xa_hoi'
+2026-10-17 16:57:21,986 INFO __main__: get_appeal_by_id() được gọi: appeal_id='4050dca2'
+2026-10-17 16:57:22,007 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
+2026-10-17 16:57:22,010 INFO __main__: list_appeals() được gọi: student_id='SV001'
+2026-10-17 16:57:22,014 INFO __main__: list_appeals() được gọi: student_id='Huy'
