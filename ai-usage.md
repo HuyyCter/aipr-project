@@ -6,25 +6,30 @@ Khai báo trung thực việc dùng AI/LLM hỗ trợ viết code trong project 
 
 ## SV1 — Tầng (a) Tra cứu + Agent Loop + MCP Client
 
-**Công cụ AI đã dùng:** _(ví dụ: Claude, ChatGPT, GitHub Copilot...)_
+**Công cụ AI đã dùng:** ChatGPT
 
 **Dùng cho phần nào:**
+- [x] Lên kế hoạch lộ trình tiến độ, phân kỳ mốc merge code (`context/roadmap-sv1.md`)
+- [x] `rag/test-rag/test_rag.py`
+- [x] `rag/build_index`
 - [ ] `rag/models.py`
 - [ ] `rag/chunking.py`
 - [ ] `rag/store.py`
 - [ ] `rag/hybrid_search.py`
-- [ ] `agent/mcp_client.py`
-- [ ] `agent/loop.py`
-- [ ] `prompts/*.txt`
+- [ ] `rag/jina_embeddings`
+- [ ] `rag/embeddings.py`
 - [ ] Khác: ___
 
 **Prompt chính đã dùng** (dán nguyên văn 1-2 prompt tiêu biểu nhất, không cần toàn bộ lịch sử chat):
 ```
-(điền sau)
+1. Nho ban overview qua du an, tui la sinh vien co nhiem vu phu trach stage-a.
+2. Hien tai toi nghi minh nen tao build_index.py de khi nap tai lieu Markdown, tien xu ly
+thi ta co the embeddings san tu cache va xuat index.json de han che goi API du thua.
+3. Hien tai toi nghi minh da lam xong, nhung ta se tao test de xem no chay vung va dung y chua.
 ```
 
-**Đoạn code nào do AI sinh (vs tự viết):** mô tả ngắn gọn — ví dụ "AI sinh khung vòng lặp agent loop ban đầu, tự sửa lại phần xử lý lỗi parse JSON và thêm MAX_STEPS".
-
+**Đoạn code nào do AI sinh (vs tự viết):** 
+ChatGPT hỗ trợ đề xuất cấu trúc, viết và hoàn thiện một phần code cho `rag/build_index.py` và `rag/test-rag/test_rag.py`. Cụ thể, AI hỗ trợ xây dựng quy trình nạp tài liệu Markdown, tiền xử lý và chia chunks, tạo embeddings bằng Jina, tận dụng cache để hạn chế gọi API dư thừa, xuất `index.json`, đồng thời xây dựng các test kiểm tra tính toàn vẹn dữ liệu và các chế độ tìm kiếm BM25, Dense, Hybrid. Tôi sử dụng kết quả AI đề xuất, rà soát và chạy thử trên project thực tế, kiểm tra lỗi và điều chỉnh để phù hợp với cấu trúc project. 
 ---
 
 ## SV2 — Agent Loop (W6) + Evaluation (W5) + LLM Client (W2)

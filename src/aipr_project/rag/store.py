@@ -152,10 +152,7 @@ class DocumentStore:
             "chunks": len(self._chunks),
         }
 
-    # ---------------------------------------------------------
     # Embeddings
-    # ---------------------------------------------------------
-
     def _get_llm_client(self):
         """Create the shared project's LLM client only when needed."""
         if self.llm_client is None:
@@ -218,10 +215,8 @@ class DocumentStore:
 
         return [float(value) for value in vectors[0]]
 
-    # ---------------------------------------------------------
-    # Retrieval
-    # ---------------------------------------------------------
 
+    # Retrieval
     def _bm25_search(
         self,
         query: str,
