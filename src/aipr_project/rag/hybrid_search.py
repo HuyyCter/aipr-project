@@ -41,6 +41,7 @@ def hybrid_search(
     top_k: int = 3,
     w_bm25: float = 0.5,
     w_vector: float = 0.5,
+    min_vector_score: float | None = None,
 ) -> list[tuple[int, float]]:
     """Kết hợp tìm kiếm BM25 và vector."""
 
@@ -67,6 +68,9 @@ def hybrid_search(
 
     # 3. Tính cosine similarity giữa câu hỏi và từng chunk.
     vector_scores = [cosine_similiarity(query_vector, vector) for vector in embeddings]
+
+    if min_vector_score is not None and max(vector_scores) < min_vector_score:
+        return []
 
     # 4. Chuẩn hóa cả hai nguồn điểm.
     bm25_scores = normalise_scores(bm25_scores)

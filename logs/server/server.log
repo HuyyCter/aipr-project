@@ -181,3 +181,63 @@
 2026-10-17 16:57:22,007 INFO __main__: get_appeal_by_id() được gọi: appeal_id='khongco'
 2026-10-17 16:57:22,010 INFO __main__: list_appeals() được gọi: student_id='SV001'
 2026-10-17 16:57:22,014 INFO __main__: list_appeals() được gọi: student_id='Huy'
+2026-10-17 19:20:05,620 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 19:20:54,233 INFO __main__: search_regulations() được gọi: query='Điều 5 đánh giá những tiêu chí nào', top_k=3
+2026-10-17 19:22:51,098 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện kể từ ngày công bố kết quả', top_k=3
+2026-10-17 19:38:19,612 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 19:38:22,274 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-17 19:38:27,358 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=3
+2026-10-17 19:38:47,194 INFO __main__: get_document() được gọi: doc_id='DOC0001'
+2026-10-17 19:39:15,134 INFO __main__: search_regulations() được gọi: query='khiếu nại trong thời hạn', top_k=5
+2026-10-17 19:39:41,019 INFO __main__: search_regulations() được gọi: query='thời hạn', top_k=5
+2026-10-17 19:40:10,585 INFO __main__: search_regulations() được gọi: query='thời hạn khiếu nại', top_k=5
+2026-10-17 19:40:18,961 INFO __main__: search_regulations() được gọi: query='đánh giá rèn luyện khiếu nại thời hạn', top_k=5
+2026-10-17 19:40:37,066 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị-xã hội', top_k=3
+2026-10-17 19:41:02,757 INFO __main__: search_regulations() được gọi: query='Quy chế điểm rèn luyện', top_k=3
+2026-10-17 19:41:15,043 INFO __main__: get_document() được gọi: doc_id='DOC0002'
+2026-10-17 19:41:48,846 INFO __main__: search_regulations() được gọi: query='3.3. Đánh giá về ý thức và kết quả tham gia các hoạt động chính trị', top_k=3
+2026-10-17 19:43:29,837 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập tiêu chí', top_k=3
+2026-10-17 19:43:54,796 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập tiêu chí HCMUTE', top_k=5
+2026-10-17 19:44:22,572 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích', top_k=5
+2026-10-17 19:44:46,110 INFO __main__: search_regulations() được gọi: query='học bổng', top_k=5
+2026-10-17 19:45:34,972 INFO __main__: search_regulations() được gọi: query='thời gian tốt nghiệp sớm', top_k=3
+2026-10-17 19:45:37,416 INFO __main__: search_regulations() được gọi: query='điều kiện tốt nghiệp sớm', top_k=3
+2026-10-17 19:45:40,716 INFO __main__: search_regulations() được gọi: query='tốt nghiệp sớm', top_k=3
+2026-10-17 19:46:20,798 INFO __main__: search_regulations() được gọi: query='nghỉ học tạm thời giấy tờ', top_k=3
+2026-10-17 19:46:39,446 INFO __main__: search_regulations() được gọi: query='thủ tục xin nghỉ học tạm thời', top_k=3
+2026-10-17 19:46:43,149 INFO __main__: search_regulations() được gọi: query='nghỉ học', top_k=5
+2026-10-17 20:10:39,527 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 20:10:41,613 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-17 20:10:54,435 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-17 20:10:57,599 INFO __main__: search_regulations() được gọi: query='thời hạn khiếu nại đánh giá rèn luyện', top_k=5
+2026-10-17 20:11:50,115 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị-xã hội', top_k=3
+2026-10-17 20:12:14,881 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện năm trước', top_k=3
+2026-10-17 20:12:36,739 INFO __main__: search_regulations() được gọi: query='chính trị-xã hội DOC0002', top_k=3
+2026-10-17 20:12:54,098 INFO __main__: search_regulations() được gọi: query='hoạt động chính trị, xã hội DOC0002', top_k=3
+2026-10-17 20:13:39,993 INFO __main__: search_regulations() được gọi: query='điểm rèn luyện 2021 quy chế', top_k=5
+2026-10-17 20:13:56,092 INFO __main__: search_regulations() được gọi: query='DOC0001 điểm rèn luyện 2021', top_k=5
+2026-10-17 20:15:15,836 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập tiêu chí', top_k=3
+2026-10-17 20:15:42,906 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích', top_k=5
+2026-10-17 20:15:46,988 INFO __main__: search_regulations() được gọi: query='học bổng', top_k=5
+2026-10-17 20:16:02,901 INFO __main__: search_regulations() được gọi: query='học bổng khuyến khích học tập điểm', top_k=5
+2026-10-17 20:16:44,946 INFO __main__: search_regulations() được gọi: query='học phí học kỳ hệ chính quy', top_k=3
+2026-10-17 20:17:11,581 INFO __main__: search_regulations() được gọi: query='học phí học kỳ hệ chính quy 2024', top_k=5
+2026-10-17 20:17:19,570 INFO __main__: search_regulations() được gọi: query='học phí', top_k=5
+2026-10-17 20:17:50,659 INFO __main__: search_regulations() được gọi: query='đợt I học phí', top_k=5
+2026-10-17 20:18:20,559 INFO __main__: search_regulations() được gọi: query='mức học phí học kỳ', top_k=5
+2026-10-17 20:19:01,929 INFO __main__: search_regulations() được gọi: query='thời gian tốt nghiệp sớm', top_k=3
+2026-10-17 20:19:04,571 INFO __main__: search_regulations() được gọi: query='điều kiện tốt nghiệp sớm', top_k=3
+2026-10-17 20:19:11,859 INFO __main__: search_regulations() được gọi: query='tốt nghiệp sớm', top_k=5
+2026-10-17 20:19:58,215 INFO __main__: search_regulations() được gọi: query='thời gian tốt nghiệp', top_k=5
+2026-10-17 20:52:24,455 INFO __main__: RAG loaded: 241 chunks, {'documents': 2, 'chunks': 241}
+2026-10-17 20:52:38,440 INFO __main__: search_regulations() được gọi: query='Ý thức chấp hành nội quy, quy chế tối đa điểm', top_k=3
+2026-10-17 20:52:43,055 INFO __main__: search_regulations() được gọi: query='hạn nộp khiếu nại kết quả đánh giá rèn luyện', top_k=5
+2026-10-17 20:52:56,331 INFO __main__: search_regulations() được gọi: query='thời hạn khiếu nại đánh giá rèn luyện', top_k=5
+2026-10-17 20:53:19,365 INFO __main__: search_regulations() được gọi: query='kể từ ngày công bố kết quả đánh giá rèn luyện một tuần', top_k=5
+2026-10-17 20:53:39,672 INFO __main__: search_regulations() được gọi: query='quy chế điểm rèn luyện hoạt động chính trị-xã hội', top_k=3
+2026-10-17 20:53:58,552 INFO __main__: search_regulations() được gọi: query='khung xếp loại điểm rèn luyện 2021', top_k=5
+2026-10-17 20:54:06,478 INFO __main__: search_regulations() được gọi: query='điểm rèn luyện 2024 khung xếp loại', top_k=5
+2026-10-17 20:54:17,980 INFO __main__: search_regulations() được gọi: query='xếp loại điểm rèn luyện 2021', top_k=5
+2026-10-17 20:54:49,995 INFO __main__: search_regulations() được gọi: query='điểm rèn luyện 2021 khung', top_k=5
+2026-10-17 20:55:13,320 INFO __main__: search_regulations() được gọi: query='Phụ lục 1 – Bảng khung điểm', top_k=5
+2026-10-17 20:55:59,386 INFO __main__: search_regulations() được gọi: query='điểm rèn luyện 2021 xếp loại', top_k=5

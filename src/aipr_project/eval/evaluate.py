@@ -133,9 +133,8 @@ def build_ragas_dataset(
     return Dataset.from_dict(data)
 
 
-def run_ragas(test_set: list[TestCase]):
-    """Run the agent on every question and evaluate with RAGAS."""
-    run_id, answers = asyncio.run(ask_all(test_set))
+def score_answers(test_set: list[TestCase], answers: list[str], run_id: str):
+    """Chấm RAGAS trên answers đã có sẵn (không chạy lại agent)."""
     run_log = read_run_log(run_id)
     llm, embeddings = get_ragas_models()
     answer_relevancy.strictness = 1
@@ -143,7 +142,6 @@ def run_ragas(test_set: list[TestCase]):
     source_list = [
         get_contexts(run_log, line.id) or ["Không có context"] for line in test_set
     ]
-
     dataset = build_ragas_dataset(test_set, answers, source_list)
 
     return evaluate(
@@ -151,27 +149,138 @@ def run_ragas(test_set: list[TestCase]):
         metrics=[faithfulness, answer_relevancy, context_precision, context_recall],
         llm=llm,
         embeddings=embeddings,
-        run_config=RunConfig(timeout=30, max_retries=1),
-        raise_exceptions=True,
+        run_config=RunConfig(timeout=120, max_retries=3, max_workers=2),
+        raise_exceptions=False,  # 1 job lỗi -> NaN, không chết cả lượt
     )
 
 
-if __name__ == "__main__":
-    # chat = ChatOpenAI(
-    #     model="openai/gpt-oss-20b",
-    #     base_url="https://api.groq.com/openai/v1",
-    #     api_key=os.getenv("GROQ_API_KEY"),
-    #     temperature=0,
-    #     reasoning_effort="low",
-    # )
-    # resp = chat.invoke(
-    #     "Liệt kê 5 điều trong một quy chế rèn luyện sinh viên, mỗi điều một dòng."
-    # )
-    # print(resp.response_metadata.get("finish_reason"), resp.usage_metadata)
-    test_set = [line for line in load_testset() if line.ground_truth]
-    print(f"Đánh giá {len(test_set)} câu có ground-truth.")
+def run_ragas(test_set: list[TestCase]):
+    run_id, answers = asyncio.run(ask_all(test_set))
+    return score_answers(test_set, answers, run_id)
 
-    score = run_ragas(test_set)
 
-    df = score.to_pandas()
-    df.to_json(OUTPUT_JSON, index=False, orient="records", force_ascii=False, indent=4)
+# ======================== REPORT: usage + tỉ lệ từ chối ========================
+METRICS = ["faithfulness", "answer_relevancy", "context_precision", "context_recall"]
+
+REFUSAL_MARKERS = (
+    "không tìm thấy",
+    "không đề cập",
+    "không có thông tin",
+    "không có quy định",
+    "chỉ hỗ trợ",
+    "ngoài phạm vi",
+    "không thuộc phạm vi",
+    "couldn't find",
+    "could not find",
+    "not found",
+    "no information",
+    "not covered",
+    "outside the scope",
+    "only support",
+    "only help",
+)
+
+
+def is_agent_error(answer: str) -> bool:
+    return answer.startswith("Error") or answer.startswith("Đã vượt quá số bước")
+
+
+def is_refusal(answer: str) -> bool:
+    text = answer.lower()
+    return any(marker in text for marker in REFUSAL_MARKERS)
+
+
+def usage_per_question(run_log: list[dict], question_id: str) -> dict:
+    calls = prompt = completion = max_prompt = tool_calls = 0
+    for line in run_log:
+        if line.get("question_id") != question_id:
+            continue
+        if line.get("step_type") == "tool_call":
+            tool_calls += 1
+        elif line.get("step_type") == "llm_call":
+            usage = line.get("usage") or {}
+            p = usage.get("prompt_tokens", 0)
+            calls += usage.get("calls", 1)
+            prompt += p
+            completion += usage.get("completion_tokens", 0)
+            max_prompt = max(max_prompt, p)
+    return {
+        "calls": calls,
+        "tool_calls": tool_calls,
+        "prompt_tokens": prompt,
+        "completion_tokens": completion,
+        "max_prompt": max_prompt,
+    }
+
+
+def _num(value):
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return None
+    return None if number != number else round(number, 4)  # NaN -> None
+
+
+def _mean(values):
+    values = [v for v in values if v is not None]
+    return round(sum(values) / len(values), 4) if values else None
+
+
+def build_report(
+    test_set: list[TestCase],
+    answers: list[str],
+    run_log: list[dict],
+    run_id: str,
+    scored_ids: list[str],
+    ragas_df=None,
+) -> dict:
+    """Gom kết quả từng câu + tổng kết. ragas_df=None nếu chưa/không chấm được."""
+    ragas_by_id = {}
+    if ragas_df is not None:
+        for qid, (_, row) in zip(scored_ids, ragas_df.iterrows()):
+            ragas_by_id[qid] = {m: _num(row.get(m)) for m in METRICS}
+
+    rows = []
+    for case, answer in zip(test_set, answers):
+        error = is_agent_error(answer)
+        rows.append(
+            {
+                "id": case.id,
+                "type": case.type,
+                "question": case.question,
+                "answer": answer,
+                "agent_error": error,
+                "refused": False if error else is_refusal(answer),
+                "usage": usage_per_question(run_log, case.id),
+                "ragas": ragas_by_id.get(case.id),
+            }
+        )
+
+    no_answer = [r for r in rows if r["type"] == "no_answer"]
+    correct_refusals = [r for r in no_answer if r["refused"]]
+    answerable = [r for r in rows if r["type"] in ("direct", "synthesis")]
+    false_refusals = [r for r in answerable if r["refused"]]
+    usages = [r["usage"] for r in rows]
+
+    summary = {
+        "run_id": run_id,
+        "n_questions": len(rows),
+        "agent_errors": [r["id"] for r in rows if r["agent_error"]],
+        "ragas_scored_ids": list(ragas_by_id),
+        "ragas_mean": {m: _mean([v[m] for v in ragas_by_id.values()]) for m in METRICS},
+        "refusal": {
+            "no_answer_total": len(no_answer),
+            "correct_refusals": len(correct_refusals),
+            "correct_refusal_rate": (
+                round(len(correct_refusals) / len(no_answer), 4) if no_answer else None
+            ),
+            "false_refusals_on_answerable": [r["id"] for r in false_refusals],
+        },
+        "usage": {
+            "total_calls": sum(u["calls"] for u in usages),
+            "total_prompt_tokens": sum(u["prompt_tokens"] for u in usages),
+            "total_completion_tokens": sum(u["completion_tokens"] for u in usages),
+            "max_prompt": max((u["max_prompt"] for u in usages), default=0),
+        },
+    }
+    return {"summary": summary, "questions": rows}
