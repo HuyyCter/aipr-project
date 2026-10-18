@@ -12,3 +12,4 @@
 {"appeal_id": "d821bdef", "student_id": "SV001", "reason": "thiếu minh chứng", "category": "chinh_tri_xa_hoi", "status": "PENDING", "timestamp": "2026-10-13T02:45:53.465570+00:00"}
 {"appeal_id": "ba4ecca2", "student_id": "SV001", "reason": "Thiếu minh chứng tình nguyện", "category": "chinh_tri_xa_hoi", "status": "PENDING", "timestamp": "2026-10-14T01:51:02.428345+00:00"}
 {"appeal_id": "4050dca2", "student_id": "SV001", "reason": "Thiếu minh chứng hoạt động tình nguyện", "category": "chinh_tri_xa_hoi", "status": "PENDING", "timestamp": "2026-10-17T09:57:21.598485+00:00"}
+{"appeal_id": "40b3dece", "student_id": "SV001", "reason": "Thiếu minh chứng hoạt động tình nguyện", "category": "chinh_tri_xa_hoi", "status": "PENDING", "timestamp": "2026-10-18T13:05:23.249303+00:00"}

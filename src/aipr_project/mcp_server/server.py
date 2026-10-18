@@ -23,7 +23,7 @@ RUBRIC_PATH = PROJECT_ROOT / "data" / "rubric.json"
 
 NOT_FOUND_MESSAGE = "Không tìm thấy nội dung liên quan trong tài liệu."
 MAX_DOCUMENT_CHARS = 800
-MIN_VECTOR_SCORE = 0.45
+MIN_VECTOR_SCORE = 0.5
 
 with open(RUBRIC_PATH, "r", encoding="utf-8") as f:
     RUBRIC = json.load(f)

@@ -1,0 +1,285 @@
+{
+  "summary": {
+    "run_id": "20261018-130711",
+    "n_questions": 14,
+    "agent_errors": [
+      "q03"
+    ],
+    "ragas_scored_ids": [
+      "q01",
+      "q02",
+      "q04",
+      "q05",
+      "q06"
+    ],
+    "ragas_mean": {
+      "faithfulness": 0.5542,
+      "answer_relevancy": 0.6197,
+      "context_precision": 0.64,
+      "context_recall": 0.6333
+    },
+    "refusal": {
+      "no_answer_total": 4,
+      "correct_refusals": 4,
+      "correct_refusal_rate": 1.0,
+      "false_refusals_on_answerable": []
+    },
+    "usage": {
+      "total_calls": 41,
+      "total_prompt_tokens": 138537,
+      "total_completion_tokens": 10385,
+      "max_prompt": 6280
+    }
+  },
+  "questions": [
+    {
+      "id": "q01",
+      "type": "direct",
+      "question": "Mục ý thức chấp hành nội quy, quy chế tối đa bao nhiêu điểm?",
+      "answer": "Mục **Ý thức chấp hành nội quy, quy chế** được quy định trong quy chế đánh giá kết quả rèn luyện của sinh viên tại HCMUTE có **điểm tối đa 25 điểm**.\n\n> **Nguồn**:  \n> [DOC0001] *Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy* – Trường Đại học Sư phạm Kỹ thuật TP.HCM (phiên bản 2021‑v1, 2021)  \n> “Khung điểm đánh giá từ 0 điểm đến **25 điểm**.”  \n\nNếu bạn cần thêm chi tiết về cách tính điểm hoặc các tiêu chí cụ thể, hãy cho tôi biết!",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 2,
+        "tool_calls": 1,
+        "prompt_tokens": 5085,
+        "completion_tokens": 316,
+        "max_prompt": 2944
+      },
+      "ragas": {
+        "faithfulness": 0.25,
+        "answer_relevancy": 0.7417,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      }
+    },
+    {
+      "id": "q02",
+      "type": "direct",
+      "question": "Hạn nộp khiếu nại kết quả đánh giá rèn luyện là bao lâu kể từ ngày công bố kết quả?",
+      "answer": "Hạn nộp khiếu nại kết quả đánh giá rèn luyện là **trong vòng 2 tuần kể từ ngày công bố kết quả**.  \n*(Theo quy định trong Sổ tay sinh viên khoá 2024 – “Đánh giá kết quả rèn luyện” – mục 6. Quy trình đánh giá kết quả rèn luyện, đoạn: “SV có trách nhiệm kiểm tra và có quyền đề nghị bổ sung hoặc sửa đổi các nội dung còn thiếu hoặc sai lệch so với điểm kết quả được công bố trên phần mềm chuyên biệt … trong thời gian hai tuần kể từ ngày điểm được công bố.”)*",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 6,
+        "tool_calls": 5,
+        "prompt_tokens": 23955,
+        "completion_tokens": 2198,
+        "max_prompt": 6280
+      },
+      "ragas": {
+        "faithfulness": 0.6667,
+        "answer_relevancy": 0.8025,
+        "context_precision": 0.3667,
+        "context_recall": 0.5
+      }
+    },
+    {
+      "id": "q03",
+      "type": "synthesis",
+      "question": "Nếu sinh viên có minh chứng tham gia hoạt động chính trị-xã hội ở cả học kỳ này và quy định đã thay đổi so với năm trước, thì tính theo quy chế nào?",
+      "answer": "Đã vượt quá số bước xử lý cho phép.",
+      "agent_error": true,
+      "refused": false,
+      "usage": {
+        "calls": 6,
+        "tool_calls": 6,
+        "prompt_tokens": 23532,
+        "completion_tokens": 659,
+        "max_prompt": 5685
+      },
+      "ragas": null
+    },
+    {
+      "id": "q04",
+      "type": "synthesis",
+      "question": "So sánh khung xếp loại điểm rèn luyện của sinh viên giữa quy định năm 2021 và quy định năm 2024",
+      "answer": "(the model returned no content)",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 6,
+        "tool_calls": 5,
+        "prompt_tokens": 25692,
+        "completion_tokens": 2591,
+        "max_prompt": 6164
+      },
+      "ragas": {
+        "faithfulness": null,
+        "answer_relevancy": 0.0,
+        "context_precision": 0.0,
+        "context_recall": 0.0
+      }
+    },
+    {
+      "id": "q05",
+      "type": "direct",
+      "question": "Nếu sinh viên không xác nhận điểm rèn luyện trên trang online của trường thì bị xử lý như thế nào?",
+      "answer": "Nếu sinh viên không xác nhận bảng điểm rèn luyện trên trang online của trường, hệ thống sẽ tự động trừ **10 điểm rèn luyện** (dựa trên kết quả do phần mềm đánh giá). Khi đó sinh viên **không có quyền khiếu nại** các vấn đề liên quan đến điểm rèn luyện cá nhân trong học kỳ được đánh giá.\n\n> **Trích dẫn**:  \n> *“Sinh viên thống nhất kết quả điểm rèn luyện học kỳ của cá nhân bằng việc xác nhận bảng điểm rèn luyện trên trang online SV. SV không thực hiện sẽ bị trừ 10 (mười) điểm rèn luyện (dựa trên kết quả do phần mềm chuyên biệt đánh giá) và không có quyền khiếu nại các vấn đề liên quan đến điểm rèn luyện cá nhân trong học kỳ được đánh giá.”*  \n> (Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy – Trường Đại học Sư phạm Kỹ thuật TP.HCM, phiên bản 2021‑v1)\n\nVì vậy, để tránh mất điểm và có thể khiếu nại nếu cần, sinh viên nên xác nhận bảng điểm rèn luyện ngay khi có thời hạn trên trang online.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 2,
+        "tool_calls": 1,
+        "prompt_tokens": 5129,
+        "completion_tokens": 470,
+        "max_prompt": 2984
+      },
+      "ragas": {
+        "faithfulness": 0.8,
+        "answer_relevancy": 0.7192,
+        "context_precision": 1.0,
+        "context_recall": 1.0
+      }
+    },
+    {
+      "id": "q06",
+      "type": "synthesis",
+      "question": "Điểm rèn luyện toàn khóa được tính như thế nào và cần đạt tối thiểu bao nhiêu điểm để được xét tốt nghiệp?",
+      "answer": "**Cách tính điểm rèn luyện toàn khóa**\n\n1. **Điểm rèn luyện học kỳ**  \n   - Mỗi học kỳ, sinh viên được đánh giá theo 5 tiêu chí:  \n     - **Ý thức học tập** (tối đa 20 đ)  \n     - **Chấp hành nội quy** (tối đa 25 đ)  \n     - **Hoạt động chính trị‑xã hội** (tối đa 20 đ)  \n     - **Phẩm chất công dân** (tối đa 25 đ)  \n     - **Công tác lớp‑đoàn** (tối đa 10 đ)  \n   - Tổng điểm học kỳ = tổng các điểm trên (điểm tối đa 100 đ).  \n   - Nếu sinh viên chưa xác nhận điểm trên hệ thống, hệ thống sẽ trừ 10 đ (điểm thực tế = tổng - 10).  \n\n2. **Điểm rèn luyện toàn khóa**  \n   - **Công thức**:  \n     \\[\n     \\text{Điểm rèn luyện toàn khóa} = \\frac{\\sum_{k=1}^{n} \\text{Điểm rèn luyện học kỳ}_k}{n}\n     \\]\n     trong đó \\(n\\) là số học kỳ đã hoàn thành trong khóa học.  \n   - Ví dụ: Nếu sinh viên có điểm 70 đ trong học kỳ I và 80 đ trong học kỳ II, điểm rèn luyện toàn khóa = (70 + 80) / 2 = 75 đ.  \n\n**Điểm tối thiểu để được xét tốt nghiệp**\n\n- Theo quy định của Trường Đại học Sư phạm Kỹ thuật TP.HCM, **điểm rèn luyện toàn khóa phải đạt ít nhất 50 đ trên 100 đ** để được xét tốt nghiệp.  \n- Nếu điểm rèn luyện toàn khóa < 50 đ, sinh viên sẽ bị xếp loại rèn luyện yếu hoặc kém và có thể bị tạm ngừng học ít nhất một học kỳ trong học kỳ tiếp theo.  \n\n> **Nguồn**:  \n> - [DOC0002] Sổ tay sinh viên khoá 2024 – “SV phải đảm bảo điểm rèn luyện toàn khóa đạt 50/100 điểm để được xét tốt nghiệp”.  \n> - [DOC0001] Quy định đánh giá kết quả rèn luyện của sinh viên đại học hệ chính quy – “Điểm rèn luyện toàn khóa là trung bình cộng của điểm rèn luyện các học kỳ của khóa học”.  \n\nNếu bạn cần biết điểm rèn luyện học kỳ cụ thể hoặc muốn kiểm tra điểm rèn luyện của mình, hãy yêu cầu cấp bảng điểm rèn luyện theo học kỳ.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 2,
+        "tool_calls": 1,
+        "prompt_tokens": 4938,
+        "completion_tokens": 813,
+        "max_prompt": 2788
+      },
+      "ragas": {
+        "faithfulness": 0.5,
+        "answer_relevancy": 0.8351,
+        "context_precision": 0.8333,
+        "context_recall": 0.6667
+      }
+    },
+    {
+      "id": "q07",
+      "type": "calc",
+      "question": "Với minh chứng hiện có của sinh viên SV001 trong học kỳ này, điểm rèn luyện là bao nhiêu và xếp loại gì?",
+      "answer": "Xin chào! Để tính tổng điểm rèn luyện và xác định xếp loại học kỳ của sinh viên **SV001**, mình cần biết điểm của từng tiêu chí sau:\n\n| Tiêu chí | Mã | Điểm tối đa |\n|----------|----|-------------|\n| Ý thức học tập | `hoc_tap` | 20 |\n| Ý thức chấp hành nội quy | `chap_hanh_noi_quy` | 25 |\n| Hoạt động chính trị – xã hội, văn hoá, thể thao | `chinh_tri_xa_hoi` | 20 |\n| Phẩm chất công dân và quan hệ cộng đồng | `pham_chat_cong_dan` | 25 |\n| Phụ trách công tác lớp, đoàn thể | `cong_tac_lop_doan_hoi` | 10 |\n\nBạn vui lòng cung cấp điểm của **SV001** cho từng mục trên (hoặc cho biết bạn đã xác nhận điểm trên hệ thống). Khi đã có đầy đủ 5 điểm, mình sẽ tính tổng và xếp loại cho bạn.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2152,
+        "completion_tokens": 390,
+        "max_prompt": 2152
+      },
+      "ragas": null
+    },
+    {
+      "id": "q08",
+      "type": "calc",
+      "question": "Tính điểm rèn luyện của sinh viên SV002, biết minh chứng mục hoạt động chính trị-xã hội chưa được nộp.",
+      "answer": "Xin chào!  \nĐể tính tổng điểm rèn luyện và xếp loại học kỳ, tôi cần biết điểm của **các 5 tiêu chí** sau:\n\n| Tiêu chí | Mã | Điểm tối đa |\n|----------|----|-------------|\n| Ý thức học tập | `hoc_tap` | 20 |\n| Ý thức chấp hành nội quy | `chap_hanh_noi_quy` | 25 |\n| Hoạt động chính trị‑xã hội | `chinh_tri_xa_hoi` | 20 |\n| Phẩm chất công dân và quan hệ cộng đồng | `pham_chat_cong_dan` | 25 |\n| Phụ trách công tác lớp, đoàn thể | `cong_tac_lop_doan_hoi` | 10 |\n\nBạn đã cho biết rằng **minh chứng cho mục “Hoạt động chính trị‑xã hội” chưa được nộp**, vì vậy tôi chưa có điểm cho mục này.  \nVui lòng cung cấp điểm (hoặc thông tin minh chứng) cho **các mục còn lại** (hoặc cho mục “Hoạt động chính trị‑xã hội” khi có) để tôi có thể tính tổng điểm và xếp loại cho sinh viên SV002.  \n\nCảm ơn bạn!",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2151,
+        "completion_tokens": 503,
+        "max_prompt": 2151
+      },
+      "ragas": null
+    },
+    {
+      "id": "q09",
+      "type": "action",
+      "question": "Tôi muốn khiếu nại điểm mục hoạt động chính trị-xã hội, lý do: còn thiếu 1 minh chứng chưa được tính vào điểm.",
+      "answer": "Chào bạn! Để nộp đơn khiếu nại, mình cần biết mã sinh viên của bạn. Bạn vui lòng cung cấp mã sinh viên (ví dụ: SV001) để mình tiến hành nộp đơn cho bạn.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2154,
+        "completion_tokens": 127,
+        "max_prompt": 2154
+      },
+      "ragas": null
+    },
+    {
+      "id": "q10",
+      "type": "action",
+      "question": "Tôi muốn nộp đơn khiếu nại điểm rèn luyện học kỳ này vì thấy kết quả bị sai lệch, nhờ hệ thống nộp đơn khiếu nại giúp tôi.",
+      "answer": "Chào bạn! Để nộp đơn khiếu nại điểm rèn luyện, mình cần một số thông tin từ bạn:\n\n1. **Mã sinh viên** (ví dụ: SV001)  \n2. **Lý do khiếu nại** (mô tả ngắn gọn vì sao bạn cho rằng điểm sai lệch)  \n3. **Mục điểm bị khiếu nại** (ví dụ: `hoc_tap`, `chap_hanh_noi_quy`, `chinh_tri_xa_hoi`, `pham_chat_cong_dan`, `cong_tac_lop_doan_hoi`)\n\nBạn vui lòng cung cấp các thông tin trên để mình tiến hành nộp đơn cho bạn nhé.",
+      "agent_error": false,
+      "refused": false,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2164,
+        "completion_tokens": 228,
+        "max_prompt": 2164
+      },
+      "ragas": null
+    },
+    {
+      "id": "q11",
+      "type": "no_answer",
+      "question": "Học bổng khuyến khích học tập xét theo những tiêu chí nào?",
+      "answer": "Xin lỗi, hiện tại tôi không tìm thấy trong cơ sở dữ liệu quy chế của trường thông tin nào liên quan đến “học bổng khuyến khích học tập” và các tiêu chí xét duyệt. Nếu bạn có thêm chi tiết (ví dụ: tên chương trình, năm học, hoặc liên kết tới tài liệu cụ thể), vui lòng cung cấp để tôi có thể tra cứu chính xác hơn.",
+      "agent_error": false,
+      "refused": true,
+      "usage": {
+        "calls": 6,
+        "tool_calls": 5,
+        "prompt_tokens": 24081,
+        "completion_tokens": 1067,
+        "max_prompt": 5555
+      },
+      "ragas": null
+    },
+    {
+      "id": "q12",
+      "type": "no_answer",
+      "question": "Mức học phí học kỳ này của sinh viên hệ chính quy là bao nhiêu?",
+      "answer": "Xin lỗi, tôi không tìm thấy thông tin về mức học phí học kỳ của sinh viên hệ chính quy trong cơ sở dữ liệu quy chế hiện có.  \nBạn có thể tham khảo:\n\n- Trang web chính thức của Trường Đại học Sư phạm Kỹ thuật TP.HCM (địa chỉ: https://www.hcmute.edu.vn) – mục “Học phí & Hỗ trợ tài chính”.  \n- Liên hệ trực tiếp với Phòng Học vụ hoặc Phòng Tài chính để được cung cấp số liệu chính xác nhất cho học kỳ hiện tại.  \n\nNếu cần hỗ trợ tra cứu quy định khác hoặc khiếu nại điểm rèn luyện, cứ cho tôi biết nhé!",
+      "agent_error": false,
+      "refused": true,
+      "usage": {
+        "calls": 3,
+        "tool_calls": 2,
+        "prompt_tokens": 7650,
+        "completion_tokens": 410,
+        "max_prompt": 2793
+      },
+      "ragas": null
+    },
+    {
+      "id": "q13",
+      "type": "no_answer",
+      "question": "Quy định về thời gian tốt nghiệp sớm là gì?",
+      "answer": "Xin lỗi, hiện tại tôi không tìm thấy thông tin liên quan đến “thời gian tốt nghiệp sớm” trong cơ sở dữ liệu quy chế của trường. Nếu bạn có thêm chi tiết hoặc muốn tra cứu một phần cụ thể khác, vui lòng cho tôi biết để mình có thể hỗ trợ tốt hơn.",
+      "agent_error": false,
+      "refused": true,
+      "usage": {
+        "calls": 3,
+        "tool_calls": 2,
+        "prompt_tokens": 7714,
+        "completion_tokens": 255,
+        "max_prompt": 2832
+      },
+      "ragas": null
+    },
+    {
+      "id": "q14",
+      "type": "no_answer",
+      "question": "Tôi đã làm mất kính trong lúc làm bài thi tại phòng A101, tôi có thể báo cáo việc này ở đâu?",
+      "answer": "Xin lỗi, hiện tại tôi chỉ hỗ trợ các vấn đề liên quan đến quy chế điểm rèn luyện và quy trình khiếu nại tại HCMUTE.  \nNếu bạn cần báo cáo việc mất kính trong kỳ thi, vui lòng liên hệ trực tiếp với phòng quản lý kỳ thi hoặc bộ phận hỗ trợ sinh viên của trường để được hướng dẫn cụ thể. Nếu có bất kỳ câu hỏi nào liên quan đến điểm rèn luyện hoặc khiếu nại, tôi rất sẵn lòng giúp đỡ.",
+      "agent_error": false,
+      "refused": true,
+      "usage": {
+        "calls": 1,
+        "tool_calls": 0,
+        "prompt_tokens": 2140,
+        "completion_tokens": 358,
+        "max_prompt": 2140
+      },
+      "ragas": null
+    }
+  ]
+}
