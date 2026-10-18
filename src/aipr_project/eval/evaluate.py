@@ -73,7 +73,7 @@ def get_contexts(run_log: list[dict], question_id: str) -> list[str]:
             header, _, rest = chunk.partition("\n")
             body = rest if header.startswith("[DOC") else chunk
             contexts.append(body.strip())
-    return contexts
+    return list(dict.fromkeys(contexts))
 
 
 async def ask_all(test_set: list[TestCase]) -> tuple[str, list[str]]:
@@ -115,6 +115,7 @@ def get_ragas_models():
             api_key=os.getenv("GROQ_API_KEY"),
             temperature=0,
             max_retries=5,
+            reasoning_effort="low",
         )
     )
     return llm, LangchainEmbeddingsWrapper(JinaEmbeddings())
@@ -149,7 +150,7 @@ def score_answers(test_set: list[TestCase], answers: list[str], run_id: str):
         metrics=[faithfulness, answer_relevancy, context_precision, context_recall],
         llm=llm,
         embeddings=embeddings,
-        run_config=RunConfig(timeout=120, max_retries=3, max_workers=2),
+        run_config=RunConfig(timeout=300, max_retries=3, max_workers=1),
         raise_exceptions=False,  # 1 job lỗi -> NaN, không chết cả lượt
     )
 
